@@ -1,0 +1,354 @@
+<!doctype html>
+
+<html>
+<head>
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <link rel='icon' href="../static/images/db.png">
+    <link rel='stylesheet' href="../static/3rdparty/bootstrap-2.2.2/css/bootstrap.css">
+    <link rel='stylesheet' href="../static/3rdparty/bootstrap-2.2.2/css/bootstrap-responsive.css">
+    <link rel='stylesheet' href='../static/3rdparty/jQuery.jPlayer.2.2.0/skin/blue.monday/jplayer.blue.monday.css'>
+    <link rel='stylesheet' href='../static/3rdparty/ligature_symbols/style.css'>
+    <link rel='stylesheet' href='../static/3rdparty/prettify/prettify.css'>
+    <link href='../static/fonts/PT-serif.css' rel='stylesheet' type='text/css'>
+    <link href='../static/fonts/Inconsolata.css' rel='stylesheet' type='text/css'>
+    <link href='../static/fonts/Old-Standard-TT.css' rel='stylesheet' type='text/css'>
+
+    <link href='../static/piqunity.css' rel='stylesheet' type='text/css'>
+    <link href='../static/piqunity-reading.css' rel='stylesheet' type='text/css'>
+    <link href='../static/piqunity-lecture.css' rel='stylesheet' type='text/css'>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        messageStyle: 'simple',
+        showMathMenu: false,
+        skipStartupTypeset: false, /* TODO: */
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          skipTags: ["script","noscript","style","textarea"],
+          processEscapes: true
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }},
+        "HTML-CSS": { availableFonts: ["TeX"] }
+      });
+    </script>
+    <script type="text/javascript" src="../static/3rdparty/mathjax-2.0/MathJax.js"></script>
+
+    <style>
+    /* default */
+    /* desktop */
+    @media (min-width: 1200px) {
+    }
+    /* tablet */
+    @media (min-width: 768px) and (max-width: 1199px) {
+    }
+    /* phone */
+    @media (max-width: 767px) {
+}
+</style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <title>Xapian: a search engine library</title>
+    <link rel='stylesheet' href='../style.css'>
+</head>
+
+<body
+    style='padding-top: 40px;' ## for navbar
+    >
+        
+    <div class='navbar-fixed-top navbar piqunity'>
+        <div class='navbar-inner'>
+            <div class='container'>
+                <a class='brand lsf-icon' title='book' 
+                   href='http://dblab.cs.toronto.edu/courses/443/2013' id='home-link'>
+                    Home
+                </a>
+                <ul class='nav' id='main-navbar'>
+                    <li class='dropdown'>
+                        <a href='xapian.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            TOC <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li><a href="xapian.html#" click="scrollto [sysuid=uid_2]">1. Install</a><ul></ul><li><a href="xapian.html#" click="scrollto [sysuid=uid_3]">2. Compiling your program</a><ul></ul><li><a href="xapian.html#" click="scrollto [sysuid=uid_4]">3. The Xapian API by example</a><ul><li><a href="xapian.html#" click="scrollto [sysuid=uid_12]">3.1. Indexing documents</a><ul></ul><li><a href="xapian.html#" click="scrollto [sysuid=uid_13]">3.2. Querying documents</a><ul></ul></ul>
+                        </ul>
+                    </li>
+
+
+                    <li>
+                        <a id='navbar-scrollspy'></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class='content'>
+        <article sysuid="uid_0" data-meta='{"title": "Xapian: a search engine library", "author": "CSC443"}'><section class="coverpage"><h1><span></span>Xapian: a search engine library</h1><h2>CSC443</h2><p></p></section>
+
+<section md="yes" sysuid="uid_2" section_number="1."><h1>1. Install</h1><div><p>Xapian needs to external libraries.</p>
+<ul>
+<li><a href="http://linux.die.net/man/3/libuuid">uuid</a>.  On ubuntu, it can be
+  installed using</li>
+</ul></div><center><div sysuid="uid_5" style="max-width: 600px;width: 100%">
+        <pre lineno="" sysuid="uid_14" class="program prettyprint">
+apt-get install uuid-dev
+</pre>
+        </div></center><div><ul>
+<li><a href="http://www.zlib.net/">zlib</a>.  Ubuntu comes with zlib installed by
+  default.</li>
+</ul>
+<p>To compile the Xapian library, do the following:</p>
+<ul>
+<li>Download 
+  <a href="http://oligarchy.co.uk/xapian/1.2.13/xapian-core-1.2.13.tar.gz">Xapian core source code</a></li>
+<li>Extract the xapian core source tree to a directory.
+  Call it $XAPIAN_DIR.</li>
+<li>Make</li>
+</ul></div><center><div sysuid="uid_6" style="max-width: 600px;width: 100%">
+          <pre lineno="" class="indent program prettyprint" sysuid="uid_15">
+cd $XAPIAN_DIR
+./configure
+make
+</pre>
+      </div></center><div><p>If no error occurred, you should see the file:</p>
+<p><code>$XAPIAN_DIR/.libs/libxapian.a</code></p>
+<p>which is the static library we need to build programs using Xapian.</p></div></section>
+
+<section md="yes" sysuid="uid_3" section_number="2."><h1>2. Compiling your program</h1><div><p>Suppose your program is called <code>myprog.cc</code> which makes use of APIs
+from the Xapian library.</p>
+<p>The following shell command compiles and links the executable
+from the source code:</p></div><pre annotated="yes" sysuid="uid_7" data-blocks='{"libs": {"start": 1}, "path": {"start": 0}, "gcc": {"start": 2}}' class="program prettyprint linenums:1">export INCLUDE="-I \$XAPIAN_DIR/include -L \$XAPIAN_DIR/.libs"
+export LIBS="-lxapian -lz -luuid" 
+g++ \$INCLUDE \$LIBS -o myprog myprog.cc 
+</pre><div></div><div color="#ccc" close="yes" align-middle=".path" group="1" sysuid="uid_8" class="margin margin-right closed"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_8]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div>
+        Defines the paths to look for include headers and libraries.
+    </div></div></div></div><div></div><div color="#8cc" close="yes" align-middle=".libs" group="1" sysuid="uid_9" class="margin margin-right closed"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_9]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div>
+        Defines the libraries to be used: xapian, zlib and uuid.
+    </div></div></div></div><div></div><div color="#cca" close="yes" align-middle=".gcc" group="1" sysuid="uid_10" class="margin margin-right closed"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_10]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div>
+        Compiles and links the source code.
+    </div></div></div></div><div></div></section>
+
+<section md="yes" sysuid="uid_4" section_number="3."><h1>3. The Xapian API by example</h1><div><p>All xapian api are under the namespace <code>Xapian::</code> which is imported by:</p></div><pre lineno="" sysuid="uid_11" class="program prettyprint">
+#include &lt;xapian.h&gt;
+</pre><div></div><section md="yes" sysuid="uid_12" section_number="3.1."><h1>3.1. Indexing documents</h1><div></div><ul class="nav nav-tabs"><li class="active"><a href="xapian.html#uid_17" data-toggle="tab">Open database</a></li></ul><div class="tab-content"><div md="yes" class="important tab-pane fade in active" sysuid="uid_17" active="yes" id="uid_17"><div><p>First, we need to start with opening a <em>writable database</em>.</p></div><pre class="dark program prettyprint linenums:1" sysuid="uid_28">
+char *dbname = "...";
+Xapian::WritableDatabase db(dbname, Xapian::DB_CREATE_OR_OPEN);
+</pre><div><p>Note the flag <code>Xapian::DB_CREATE_OR_OPEN</code> will create a directory called
+<code>dbname</code> if it does not already exist.</p></div></div></div><div></div><ul class="nav nav-tabs"><li class="active"><a href="xapian.html#uid_18" data-toggle="tab">Create a document</a></li></ul><div class="tab-content"><div md="yes" class="important tab-pane fade in active" sysuid="uid_18" active="yes" id="uid_18"><div><p>Xapian stores <em>documents</em> in a database.  </p>
+<p>A document object is created by:</p></div><pre class="dark program prettyprint linenums:1" sysuid="uid_29">
+Xapian::Document doc;
+</pre><div></div></div></div><div><p>Documents can store several types of information:</p>
+<ol>
+<li><em>terms</em>: Terms are words by which a search engine can find the
+   document.  Typically, we will need to break down a text into a
+   collection of terms, and populate a document object with these
+   terms.</li>
+<li><em>values</em>: Values are <em>user defined</em> data that can be associated
+   with the document.  Examples of the values suitable to be stored in
+   a document are: document creation date, access control flags on the
+   document, and the original text which is the source of the terms of
+   the document.</li>
+</ol></div><ul class="nav nav-tabs"><li class="active"><a href="xapian.html#uid_19" data-toggle="tab">Adding terms to documents</a></li></ul><div class="tab-content"><div md="yes" class="important tab-pane fade in active" sysuid="uid_19" active="yes" id="uid_19"><div><p>Documents can add terms which are <em>references</em> to c++ strings.</p></div><pre class="dark program prettyprint linenums:1" sysuid="uid_30">
+#include &lt;string&gt;
+...
+
+std::string term = "hello";
+doc.add_term(term);
+</pre><div><p>The reason that references are used is the considerations for
+efficiency.  In a practical scenario, the text database may contain
+hundreds of millions of terms.  The
+<code>Xapian::Document.add_term(std::string &)</code>
+function accepts a reference to avoid the additional memory copy for
+each of the terms added to the documents of the database.</p></div></div></div><div></div><ul class="nav nav-tabs"><li class="active"><a href="xapian.html#uid_20" data-toggle="tab">Adding values to documents</a></li></ul><div class="tab-content"><div md="yes" class="important tab-pane fade in active" sysuid="uid_20" active="yes" id="uid_20"><div><p>Documents have special slots to hold <em>values</em>.  The slots are
+labeled by integers starting at 0.  Each slot can hold a value of
+type <code>(std::string &)</code>.</p>
+<p>Values can be added as:</p></div><pre class="dark program prettyprint linenums:1" sysuid="uid_31">
+doc.add_value(0, string("hello"));
+doc.add_value(1, string("world"));
+</pre><div></div></div></div><div></div><ul class="nav nav-tabs"><li class="active"><a href="xapian.html#uid_21" data-toggle="tab">Adding document to database</a></li></ul><div class="tab-content"><div md="yes" class="important tab-pane fade in active" sysuid="uid_21" active="yes" id="uid_21"><div><p>Documents populated with terms and values can be written to a
+writable database by:</p></div><pre class="dark program prettyprint linenums:1" sysuid="uid_32">
+db.add_document(doc);
+</pre><div></div></div></div><div><p>The <code>Xapian::WritableDatabase::add_document</code> does several things
+under the cover:</p>
+<ul>
+<li>It inserts the terms into a global dictionary of words.  This
+  dictionary is implemented using a B+ tree data structure.</li>
+<li>It inserts the document ID into the inverted list
+  of all the terms that belongs to that document.</li>
+<li>It stores the document values into a structured database.</li>
+</ul></div><ul class="nav nav-tabs"><li class="active"><a href="xapian.html#uid_22" data-toggle="tab">Committing database writes</a></li></ul><div class="tab-content"><div md="yes" class="important tab-pane fade in active" sysuid="uid_22" active="yes" id="uid_22"><div><p>The <code>db.add_document(...)</code> calls write the data asynchronously in
+units of transactions.  This means that the documents are not
+immediately added to the database unless the database issues a
+commit explicitly.</p></div><pre class="dark program prettyprint linenums:1" sysuid="uid_33">
+db.commit()
+</pre><div><p>A commit will flush the buffer causing one or more disk I/O.
+A good practice is to commit for every batch of documents added to
+the database, which a batch size of 1000 is reasonable.</p></div></div></div><div></div><ul class="nav nav-tabs"><li class="active"><a href="xapian.html#uid_23" data-toggle="tab">Reusing documents</a></li></ul><div class="tab-content"><div md="yes" class="important tab-pane fade in active" sysuid="uid_23" active="yes" id="uid_23"><div><p>Typically, we have a loop iterating over a collection text segments.
+For example, each web page fetched by a crawler will be a text
+segment.</p>
+<p>While we can choose to abstract each text segment as a separate
+document, in practice, we would like to <em>reuse</em> a single document
+object to store the text segments.</p>
+<p>A document can be reused by clearing the terms and values of a
+document:</p></div><pre class="dark program prettyprint linenums:1" sysuid="uid_34">
+doc.clear_terms();
+doc.clear_values();
+</pre><div></div></div></div><div><p>Here is a complete sample program that creates two documents.</p></div><div sysuid="uid_52" class="accordion" id="uid_52"><div class="accordion-group" sysuid="uid_53"><div class="accordion-heading"><a class="accordion-toggle" sysuid="uid_54" href="xapian.html#uid_55" data-toggle="collapse" data-parent="#uid_52">word_index.cc</a></div><div close="yes" sysuid="uid_55" class="accordion-body collapse" id="uid_55"><div class="accordion-inner" sysuid="uid_56"><div close="yes" sysuid="uid_24">
+            <pre sysuid="uid_35" class="program prettyprint linenums:1">
+#include &lt;xapian.h&gt;
+#include &lt;iostream&gt;
+#include &lt;string&gt;
+#include &lt;vector&gt;
+#include &lt;algorithm&gt;
+#include &lt;sstream&gt;
+#include "common.h"
+
+using namespace std;
+
+int main(int argc, char **argv) {
+    if(argc &lt; 2) {
+        cerr &lt;&lt; "Usage: &lt;idxname&gt;" &lt;&lt; endl;
+        exit(0);
+    }
+
+    char *idxname = argv[1];
+    Xapian::WritableDatabase db(idxname, Xapian::DB_CREATE_OR_OPEN);
+    Xapian::Document doc;
+
+    vector&lt;string&gt; words;
+    words.push_back("hello world again and again");
+    words.push_back("a brave new world world");
+
+    long lineno = 0;
+    for(vector&lt;string&gt;::iterator it = words.begin(); 
+                                 it != words.end(); 
+                                 it++, lineno++) {
+        cout &lt;&lt; "line " &lt;&lt; lineno &lt;&lt; ": ";
+        string &amp;s = *it;
+
+        // perform tokenization
+        vector&lt;string&gt; tokens;
+        word_tokenize(s, &amp;tokens);
+
+        // populate the document
+        // value[0] will be the original line
+        doc.clear_terms();
+        doc.clear_values();
+        doc.add_value(0, string(s));
+        // document is the bag of terms
+        for(vector&lt;string&gt;::iterator it_token=tokens.begin(); 
+            it_token != tokens.end(); 
+            it_token++) {
+            string &amp;token = *it_token;
+            cout &lt;&lt; token &lt;&lt; " ";
+            doc.add_term(token);
+        }
+        cout &lt;&lt; endl;
+        db.add_document(doc);
+        if(lineno % 1000 == 0) {
+            db.commit();
+        }
+    }
+}
+</pre>
+        </div></div></div></div></div><div></div></section><div></div><section md="yes" sysuid="uid_13" section_number="3.2."><h1>3.2. Querying documents</h1><div><p>Querying documents from a Xapian database involves two steps:</p>
+<ol>
+<li>build a query from <em>terms</em> with boolean flags.</li>
+<li>execute the query and collect the <em>matched</em> documents.</li>
+</ol></div><ul class="nav nav-tabs"><li class="active"><a href="xapian.html#uid_25" data-toggle="tab">Opening a read-only database</a></li></ul><div class="tab-content"><div md="yes" class="important tab-pane fade in active" sysuid="uid_25" active="yes" id="uid_25"><div><p>We need to create a Xapian database object for
+reading an existing database.</p></div><pre class="dark program prettyprint linenums:1" sysuid="uid_36">
+Xapian::Database db("mydatabase");
+</pre><div></div></div></div><div><p>A query is a sequence of pairs of the form:</p>
+<p><code>(term, flag), (term, flag), ...</code></p>
+<p>where the terms are <code>std::string</code>, and
+flags are one of;</p>
+<ul>
+<li><code>Xapian::Query::OP_AND</code></li>
+<li><code>Xapian::Query::OP_OR</code></li>
+</ul>
+<p><strong>NOTE</strong>:
+More flags and more complex Xapian query
+structures are <a href="http://xapian.org/docs/apidoc/html/classXapian_1_1Query.html">possible</a>.</p></div><ul class="nav nav-tabs"><li class="active"><a href="xapian.html#uid_26" data-toggle="tab">Building a query</a></li></ul><div class="tab-content"><div md="yes" class="important tab-pane fade in active" sysuid="uid_26" active="yes" id="uid_26"><div><p>The following code builds a query consisting of
+strings from a <code>std::vector&lt;string&gt;</code>, and all
+the term flags are <code>Xapian::Query::OP_OR</code>.</p></div><pre class="dark program prettyprint linenums:1" sysuid="uid_37">
+std::vector&lt;string&gt; terms = ...;
+Xapian::Query query(
+    Xapian::Query::OP_OR,
+    terms.begin(),
+    terms.end()
+);
+</pre><div><p>The query constructed will look for documents
+that match as many terms from <code>terms</code> as possible.
+More specifically, Xapian utilizes a variantion
+on TFIDF weighting scheme, known as the
+<a href="http://xapian.org/docs/bm25.html">BM25</a> to
+assign weights on terms.  The OR-query terms try
+to maximize the total BM25 weight of matched
+terms.</p></div></div></div><div><p>A searcher object, known as the <em>enquire</em> object, is
+responsible for scanning through the inverted list,
+and return the top-<mathjax>$k$</mathjax> matched documents from the
+best matched to the worst matched.</p></div><ul class="nav nav-tabs"><li class="active"><a href="xapian.html#uid_27" data-toggle="tab">Fetching matched documents</a></li></ul><div class="tab-content"><div md="yes" class="important tab-pane fade in active" sysuid="uid_27" active="yes" id="uid_27"><div><p>The following code fetches the top 10 matched
+documents from a database and prints the first
+value stored in the document.</p></div><pre class="dark program prettyprint linenums:1" annotated="yes" sysuid="uid_38" data-blocks='{"mset": {"start": 6}, "iter": {"start": 9, "end": 11}}'>Xapian::Database db = ...;
+Xapian::Query query = ...;
+
+Xapian::Enquire enquire(db);
+enquire.set_query(query);
+
+Xapian::MSet matches = enquire.get_mset(0, 10); 
+printf("mset size is %d\n", matches.size());
+
+for(Xapian::MSetIterator match = matches.begin(); 
+    match != matches.end();
+    match ++)                                     
+{
+
+    Xapian::Document doc = i.get_document();
+
+    std::string value0 = doc.get_value(0);
+    cout &lt;&lt; value0 &lt;&lt; endl;
+}
+</pre><div></div><div md="yes" align-middle=".mset" group="fetch" close="yes" sysuid="uid_39" class="margin margin-right closed"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_39]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div><div><p><code>Xapian::MSet</code> stores the top-10 matches in
+a ranked order.</p></div></div></div></div></div><div></div><div md="yes" align-middle=".iter" group="fetch" close="yes" sysuid="uid_40" class="margin margin-right closed"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_40]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div><div><p><code>Xapian::MSetIterator</code> is used to walk
+through the matched documents.</p></div></div></div></div></div><div></div></div></div><div></div></section><div></div></section>
+
+</article>
+    </div>
+
+        <script src="../static/3rdparty/jquery-1.8.2.min.js"></script>
+    <script src="../static/3rdparty/jQuery.jPlayer.2.2.0/jquery.jplayer.min.js"></script>
+    <script src="../static/3rdparty/popcorn-1.2/popcorn.js"></script>
+    <script src="../static/3rdparty/popcorn-1.2/popcorn.player.js"></script>
+    <script src="../static/3rdparty/jQuery.jPlayer.2.2.0/popcorn/popcorn.jplayer.js"></script>
+    <script src="../static/3rdparty/prettify/prettify.js"></script>    
+    <script src="../static/3rdparty/bootstrap-2.2.2/js/bootstrap.js"></script>
+    <script src="../static/3rdparty/sprintf-0.7-beta1.js"></script>
+
+    
+    <script> var piqunity = {staticurl: '../static'}; </script>
+    <script src="../static/utils.js"></script>
+    <script src="../static/j.actions.js"></script>
+    <script src="../static/j.baseevents.js"></script>
+    <script src="../static/j.carousel.js"></script>
+    <script src="../static/j.media.js"></script>
+    <script src="../static/j.nav.js"></script>
+    <script src="../static/j.navbar.js"></script>
+    <script src="../static/j.program.js"></script>
+    <script src="../static/j.quiz.js"></script>
+    <script src="../static/j.reading.js"></script>
+    <script src="../static/j.ref.js"></script>
+    <script src="../static/j.scrollspy.js"></script>
+    <script src="../static/j.margin.js"></script>
+
+    <script src="../static/piqunity.js"></script>
+    <script>$(function() {
+});
+</script>
+
+    
+
+
+</body>
+</html>

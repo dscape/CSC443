@@ -1,0 +1,468 @@
+<!doctype html>
+
+<html>
+<head>
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <link rel='icon' href="static/images/db.png">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap.css">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap-responsive.css">
+    <link rel='stylesheet' href='static/3rdparty/jQuery.jPlayer.2.2.0/skin/blue.monday/jplayer.blue.monday.css'>
+    <link rel='stylesheet' href='static/3rdparty/ligature_symbols/style.css'>
+    <link rel='stylesheet' href='static/3rdparty/prettify/prettify.css'>
+    <link href='static/fonts/PT-serif.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Inconsolata.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Old-Standard-TT.css' rel='stylesheet' type='text/css'>
+
+    <link href='static/piqunity.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-reading.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-lecture.css' rel='stylesheet' type='text/css'>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        messageStyle: 'simple',
+        showMathMenu: false,
+        skipStartupTypeset: false, /* TODO: */
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          skipTags: ["script","noscript","style","textarea"],
+          processEscapes: true
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }},
+        "HTML-CSS": { availableFonts: ["TeX"] }
+      });
+    </script>
+    <script type="text/javascript" src="static/3rdparty/mathjax-2.0/MathJax.js"></script>
+
+    <style>
+    /* default */
+    
+    body section {
+        font-family: "Old Standard TT";
+    }
+
+    
+        .uid_5 table th {
+            font-style: italic;
+            text-align: left;
+        }
+        .uid_5 td {
+            vertical-align: top;
+            padding: 10px;
+        }
+    
+    
+    .uid_14 .practical {
+        background: #eee;
+    }
+    .uid_14 .marking {
+        color: #500;
+        font-weight: bold;
+    }
+    .uid_14 .test {
+        font-size: 120%;
+        font-weight: bold;
+        color: #800;
+    }
+    
+    /* desktop */
+    @media (min-width: 1200px) {
+    }
+    /* tablet */
+    @media (min-width: 768px) and (max-width: 1199px) {
+    }
+    /* phone */
+    @media (max-width: 767px) {
+}
+</style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <title>Database System Technology</title>
+    <link href='http://fonts.googleapis.com/css?family=Old+Standard+TT' rel='stylesheet' type='text/css'>
+<link rel='stylesheet' href='style.css'>
+</head>
+
+<body
+    style='padding-top: 40px;' ## for navbar
+    >
+        
+    <div class='navbar-fixed-top navbar piqunity'>
+        <div class='navbar-inner'>
+            <div class='container'>
+                <a class='brand lsf-icon' title='book' 
+                   href='http://dblab.cs.toronto.edu/courses/443/2013' id='home-link'>
+                    Home
+                </a>
+                <ul class='nav' id='main-navbar'>
+                    <li class='dropdown'>
+                        <a href='index.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            TOC <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li><a href="index.html#" click="scrollto [sysuid=uid_5]">1. Articles</a><ul></ul><li><a href="index.html#" click="scrollto [sysuid=uid_6]">2. Schedule</a><ul></ul><li><a href="index.html#" click="scrollto [sysuid=uid_7]">3. Marking Scheme</a><ul></ul><li><a href="index.html#" click="scrollto [sysuid=uid_8]">4. Policy</a><ul></ul><li><a href="index.html#" click="scrollto [sysuid=uid_9]">5. Bookmarks</a><ul></ul>
+                        </ul>
+                    </li>
+
+                    <li class='dropdown revision'>
+                        <a href='index.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            Revisions <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li> 2013/02/12: Changing the marking schedule </li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a id='navbar-scrollspy'></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class='content'>
+        <article sysuid="uid_0" data-meta='{"title": "Database System Technology", "no-heading": true, "revisions": ["2013/02/12: Changing the marking schedule"], "author": "CSC 443, Winter 2013"}'>
+
+
+
+
+<section sysuid="uid_204"><center sysuid="uid_4">
+    <h1 sysuid="uid_10"> Database System Technology </h1>
+    <h2 sysuid="uid_11"> CSC443, Winter 2013 </h2>
+</center></section>
+
+<section sysuid="uid_5" section_number="1." class="uid_5"><h1>1. Articles</h1>
+    
+    <table record="\|" line=";;" heading="yes" class="table table-striped table-bordered" sysuid="uid_13"><tr sysuid="uid_23"><th sysuid="uid_48"></th><th sysuid="uid_49"> Description </th><th sysuid="uid_50"> Programming </th><th sysuid="uid_51"> Practical Learning</th></tr>
+<tr sysuid="uid_24"><td sysuid="uid_52">
+          <a href="01.introduction.html" sysuid="uid_139">Introduction</a>
+        </td><td sysuid="uid_53"> About this course
+        </td><td sysuid="uid_54"> <a href="introduction/homework.html" sysuid="uid_140">Setup</a> your programming
+          environment.
+        </td><td sysuid="uid_55">
+        </td></tr>
+<tr sysuid="uid_25"><td sysuid="uid_56">
+          <a href="02.memory-hierarchy.html" sysuid="uid_141">Memory Hierarchy</a>
+        </td><td sysuid="uid_57"> Memory hierarchy and their access characteristics
+        </td><td sysuid="uid_58"> <a href="memory-hierarchy/homework.html" sysuid="uid_142">Experiment</a>
+          with page based secondary storage data access.
+        </td><td sysuid="uid_59"> PL1
+        </td></tr>
+<tr sysuid="uid_26"><td sysuid="uid_60">
+          <a href="03.data-layout.html" sysuid="uid_143">Data Layout</a>
+        </td><td sysuid="uid_61"> Storage and maintenance of relational data on secondary
+          storage devices using heap file with pages.
+        </td><td sysuid="uid_62"> <a href="data-layout/homework.html" sysuid="uid_144">Implement</a>
+          a heap file to store relational data in pages on disk.
+          <span class="lsf" sysuid="uid_145">star</span>
+        </td><td sysuid="uid_63"> PL2
+        </td></tr>
+<tr sysuid="uid_27"><td sysuid="uid_64">
+          <a href="04.basic-index.html" sysuid="uid_146">Basic Index</a>
+        </td><td sysuid="uid_65"> The concept of indexing and simple index structures
+        </td><td sysuid="uid_66"> <a href="basic-index/homework.html" sysuid="uid_147">Use</a> your heap file implementation
+          to speed up record search and scan.
+        </td><td sysuid="uid_67"> PL3
+        </td></tr>
+<tr sysuid="uid_28"><td sysuid="uid_68">
+          <a href="05.btree-index.html" sysuid="uid_148">B+ tree</a>
+        </td><td sysuid="uid_69"> A very efficient disk-based data structure
+          based on the idea of balanced sorted trees.
+        </td><td sysuid="uid_70"> <a href="btree-index/homework.html" sysuid="uid_149">Utilize</a> B+ tree
+          library (leveldb) to speed up record search and scan.
+          <a href="tutorials/leveldb.html" sysuid="uid_150">Here</a> is a quick tutorial on
+          leveldb.
+        </td><td sysuid="uid_71"> PL4
+        </td></tr>
+<tr sysuid="uid_29"><td sysuid="uid_72">
+          <a href="06.hash-index.html" sysuid="uid_151">Hash index</a>
+        </td><td sysuid="uid_73"> A very efficient disk-based data structure 
+          based on the ideas of extendible and linear hashing.
+        </td><td sysuid="uid_74"> 
+        </td><td sysuid="uid_75">
+        </td></tr>
+<tr sysuid="uid_30"><td sysuid="uid_76">
+          <a href="07.sorting.html" sysuid="uid_152"> Disk based sorting</a>
+        </td><td sysuid="uid_77"> Sorting data on disk
+        </td><td sysuid="uid_78"> <a href="sorting/homework.html" sysuid="uid_153">Implement</a>
+          the sorting algorithm with different parameters.
+        </td><td sysuid="uid_79"> PL5
+        </td></tr>
+<tr sysuid="uid_31"><td sysuid="uid_80">
+          <a href="08.keyword-search.html" sysuid="uid_154">Keyword queries</a>
+        </td><td sysuid="uid_81"> Searching text documents using approximate string matching
+        </td><td sysuid="uid_82"> <a href="ir/homework.html" sysuid="uid_155">Implement</a>
+          a search engine using the Xapian library.
+          <a href="tutorials/xapian.html" sysuid="uid_156">Here is a tutorial</a> on programming using Xapian.
+        </td><td sysuid="uid_83"> PL6
+        </td></tr>
+<tr sysuid="uid_32"><td sysuid="uid_84">
+          <a href="project.html" sysuid="uid_157">PROJECT</a>:
+        </td><td sysuid="uid_85"> Application of database technology
+        </td><td sysuid="uid_86"> <a href="project.html" sysuid="uid_158">Extend and/or apply</a> 
+          one of the physical database technology to solve a problem.
+        </td><td sysuid="uid_87"> Project</td></tr>
+</table>
+</section>
+
+<section sysuid="uid_6" section_number="2."><h1>2. Schedule</h1>
+
+<table class="table table-bordered uid_14" sysuid="uid_14">
+    
+
+
+    <tr sysuid="uid_34">
+        <th sysuid="uid_88">Week</th>
+        <th sysuid="uid_89">Reading</th>
+        <th sysuid="uid_90">Lecture (3-5pm)</th>
+        <th sysuid="uid_91">Tutorial (5pm-6pm)</th>
+    </tr>
+    <tr sysuid="uid_35">
+        <td sysuid="uid_92"> 1 </td>
+        <td sysuid="uid_93"> Ch 1, 8, 10</td>
+        <td sysuid="uid_94"> Lecture: Storage & Indexing
+           <a href="slides/01.443w13.Intro.4up.pdf" sysuid="uid_159">Slide1</a>
+           <a href="slides/02.443w13.Indexing.4up.pdf" sysuid="uid_160">Slide2</a>
+         </td>
+        <td sysuid="uid_95">No tutorial this week</td>
+    </tr>
+    <tr sysuid="uid_36">
+        <td sysuid="uid_96"> 2 </td>
+        <td sysuid="uid_97"> Ch 9</td>
+        <td md="yes" class="practical" colspan="2" sysuid="uid_98"><div><p>Practical learning:</p>
+<ul>
+<li>Introduction and development environment</li>
+<li>(PL1) Memory hierarchy</li>
+<li>(PL2) Data layout</li>
+</ul></div></td>
+    </tr>
+    <tr sysuid="uid_37">
+        <td sysuid="uid_99"> 3 </td>
+        <td sysuid="uid_100"> Ch 11, 13, 14.4 </td>
+        <td sysuid="uid_101"> Lecture: Hash indexing, Sorting & Join
+             <a href="slides/03.443w13.HashIndex.4up.pdf" sysuid="uid_161">Slide1</a>
+             <a href="slides/04.443w13.ExtSort.4up.pdf" sysuid="uid_162">Slide2</a>
+             <a href="slides/05.443w13.Optimpl_Joins.4up.pdf" sysuid="uid_163">Slide3</a>
+        </td>
+        <td md="yes" class="practical" sysuid="uid_102"><div><p>Practical learning:</p>
+<ul>
+<li>(PL3) Basic index</li>
+<li>(PL4) B+ tree</li>
+</ul></div></td>
+    </tr>
+    <tr sysuid="uid_38">
+        <td sysuid="uid_103"> 4 </td>
+        <td sysuid="uid_104"> Ch 14</td>
+        <td sysuid="uid_105"> Lecture: Query evaluation <br sysuid="uid_164">
+                Joins from Week 3, 
+                <a href="slides/06.443w13.Optimpl_Other.pdf" sysuid="uid_165">Slides</a>
+        </td>
+        <td class="practical marking" sysuid="uid_106"> 
+            End of marking for (PL1: memory hierarhcy)
+        </td>
+    </tr>
+    <tr sysuid="uid_39">
+        <td sysuid="uid_107"> 5 </td>
+        <td sysuid="uid_108"> Ch 1, 8-14 
+              - PL1 and PL2 and matching articles (above) </td>
+        <td md="yes" class="test" sysuid="uid_109"><div><p>Test 1 in <em>WI 1017</em></p>
+<ul>
+<li><a href="slides/exam1-practice.pdf" sysuid="uid_166">Example problems</a>,</li>
+<li><a href="slides/exam1-practice-ans.txt" sysuid="uid_167">Example problem answers</a>,</li>
+<li><a href="slides/exam1-bookQuestions.txt" sysuid="uid_168">Additional problems from the text</a></li>
+</ul></div></td>
+        <td md="yes" class="practical" sysuid="uid_110"><div><p>Practical learning:</p>
+<ul>
+<li>(PL5) Sorting</li>
+</ul></div></td>
+    </tr>
+    <tr sysuid="uid_40">
+        <td sysuid="uid_111"> 6 </td>
+        <td sysuid="uid_112"> Ch 15 </td>
+        <td sysuid="uid_113"> Lecture: Optimization
+            <a href="slides/07.443w13.QOpt.4up.pdf" sysuid="uid_169">Slides</a>
+        </td>
+        <td md="yes" class="practical marking" sysuid="uid_114"><div><p>End of marking for (PL2: data layout)</p>
+<ul>
+<li>Note that PL2 must be submitted on CDF by noon Tues Feb 12th</li>
+</ul></div></td>
+    </tr>
+    <tr sysuid="uid_41">
+        <td colspan="4" style="background: #000; color:#fff;" sysuid="uid_115"> 
+            <center sysuid="uid_170">
+                Reading week
+            </center>
+        </td>
+    </tr>
+    <tr sysuid="uid_42">
+        <td sysuid="uid_116"> 7 </td>
+        <td sysuid="uid_117"> Ch 16, 17 </td>
+        <td sysuid="uid_118"> 
+            Lecture:  CC 
+            <a href="slides/08.443w13.CC.CH17.4up.pdf" sysuid="uid_171">Slides</a>
+       </td>
+        <td md="yes" class="practical" sysuid="uid_119"><div><ul>
+<li>(PL6) Information retrieval & keyword search </li>
+<li>End of marking for (PL3: basic index) <i addclass="marking" sysuid="uid_172" add-class="marking" class="instruction"></i></li>
+</ul></div></td>
+    </tr>
+    <tr sysuid="uid_43">
+        <td sysuid="uid_120"> 8 </td>
+        <td sysuid="uid_121">  New Material - Ch 15-17.2
+              (except 16.6-16.7 which are covered next week),
+              PL3 and PL4 and matching articles (above) </td>
+        <td class="test" sysuid="uid_122"> - Test 2 in *WI 1017*
+            - Test is cumulative  
+            - <a href="slides/exam2-practice.2013.pdf" sysuid="uid_173">Example problems</a>,
+           - <a href="slides/exam2-practice.2013.sols.pdf" sysuid="uid_174">Example problem answers</a>,
+            - <a href="slides/exam2-bookQuestions.txt" sysuid="uid_175">Additional problems from the text</a>   </td>
+        <td md="yes" class="practical" sysuid="uid_123"><div><ul>
+<li>Project week #1 </li>
+<li><i addclass="marking" sysuid="uid_176" add-class="marking" class="instruction"></i>
+  End of marking for (PL4: btree index)</li>
+</ul></div></td>
+    </tr>
+    <tr sysuid="uid_44">
+        <td sysuid="uid_124"> 9 </td>
+        <td sysuid="uid_125"> Ch 16.6-7, 17.3-17.5, 18</td>
+        <td sysuid="uid_126"> Lecture: Finish CC, Recovery
+           - <a href="slides/09.443w13.Recovery.Ch18.4up.pdf" sysuid="uid_177">Slides (4up)</a>,
+           - <a href="slides/09.443w13.Recovery.Ch18.pdf" sysuid="uid_178">Slides (1up)</a>
+        </td>
+      <td md="yes" sysuid="uid_127"><div><p>Complete CC/Recovery.  Project Discussion.
+- <i addclass="marking" sysuid="uid_179" add-class="marking" class="instruction"></i>
+  End of marking for (PL5: sorting)</p></div></td>
+    </tr>
+    <tr sysuid="uid_45">
+        <td sysuid="uid_128"> 10 </td>
+        <td sysuid="uid_129"> Ch 22 (22.1-22.5),
+             <a href="slides/10.MapReduce.pdf" sysuid="uid_180">MapReduce V. DBMS</a> </td>
+        <td sysuid="uid_130"> Guest Lecture: Parallel database & map reduce 
+           - <a href="slides/10.443w13.MapReduce.4up.pdf" sysuid="uid_181">MR Slides (4up)</a>
+          - <a href="slides/10.443w13.MapReduce.pdf" sysuid="uid_182">MR Slides (1up)</a>
+           - <a href="slides/10.443w13.ParallelDB.4up.pdf" sysuid="uid_183">PDB Slides (4up)</a>
+          - <a href="slides/10.443w13.ParallelDB.pdf" sysuid="uid_184">PDB Slides (1up)</a>        </td>
+        <td md="yes" class="practical" sysuid="uid_131"><div><ul>
+<li>Project week #3 </li>
+<li><i addclass="marking" sysuid="uid_185" add-class="marking" class="instruction"></i>
+  End of marking for (PL6: keyword search)</li>
+</ul></div></td>
+    </tr>
+    <tr sysuid="uid_46">
+        <td sysuid="uid_132"> 11 </td>
+        <td sysuid="uid_133"> Review </td>
+        <td sysuid="uid_134">Practice Problems
+           - <a href="slides/exam3-practice.2013.pdf" sysuid="uid_186">Example problems</a>,
+           - <a href="slides/exam3-practice-solutions.2013.pdf" sysuid="uid_187">Example problem answers</a></td>
+        <td class="practical marking" sysuid="uid_135"> 
+          Deadline for project extended to Wed April 3rd 5pm.  
+       </td>
+    </tr>
+    <tr sysuid="uid_47">
+        <td sysuid="uid_136"> 12 </td>
+        <td sysuid="uid_137"> Cummulative </td>
+        <td colspan="2" class="test" sysuid="uid_138"> Test 3 in *WI 1017* 3 hours (3-6pm) </td>
+   </tr>
+</table>
+
+
+</section>
+
+<section sysuid="uid_7" section_number="3."><h1>3. Marking Scheme</h1>
+
+    <table record="," class="table table-bordered" sysuid="uid_189"><tr sysuid="uid_190"><td sysuid="uid_194">Tests: best 2 out of 3  </td><td sysuid="uid_195">  67% </td></tr>
+<tr sysuid="uid_191"><td sysuid="uid_196">PL: best 5 out of 6 </td><td sysuid="uid_197"> 33%</td></tr>
+<tr sysuid="uid_192"><td sysuid="uid_198"><b sysuid="uid_202"> Total </b></td><td sysuid="uid_199"> <b sysuid="uid_203">100%</b></td></tr>
+<tr sysuid="uid_193"><td sysuid="uid_200">(optional extra credit ) Project </td><td sysuid="uid_201">   up to 10%</td></tr>
+</table>
+
+
+
+</section>
+
+<section markdown="yes" sysuid="uid_8" section_number="4."><h1>4. Policy</h1><div><p><strong>Text:</strong> <a href="http://pages.cs.wisc.edu/~dbbook/" sysuid="uid_16">Database
+Management Systems</a>, by Raghu Ramakrishnan and Johannes Gehrke, 3rd
+Edition.  The book's website has good resources including slides and
+answers to some of the problems in the book.  Note: the bookstore
+originally had the wrong book, I'm told that has now been fixed but
+please double check that you get the right book.</p>
+<p><strong>Marking:</strong>  the practical learning tasks (PL1-PL6) and project can be
+complete in teams of up to 3 people.  One of the practical learning
+tasks may be handed in late (<strong>with  a 20% late penalty</strong>).  Late tasks
+will not be marked until Week 11.   </p>
+<p><strong>Submission:</strong> all members of the team must submit using your account
+on <a href="http://www.cdf.toronto.edu" sysuid="uid_17">CDF</a> before the
+TA marks your work.  Use "man submit" on CDF if you are not familiar 
+with this command.</p>
+<p><strong>Deadlines:</strong> all practical learning tasks must be submitted by
+  Monday 5pm (on CDF) of the week indicated above.  Meaning:  Week 4
+  for PL1 (Monday Jan 28th 5pm), Week 6 for PL2, Week 7 for PL3 & PL4,
+  Week 9 for PL5 & PL 6, Week 11 for project.  <strong>Change announced Week
+  6:  new submission time is Tues noon for PL2 onward, and PL4 now due
+  Week 8, PL6 Week 10.</strong> Marking will be done
+  interactively with the TAs in a tutorial after submission but no later
+  than the tutorial of the weeks indicated.</p>
+<p><strong>Tests:</strong>  all tests permit one sheet of paper ("cheat sheet") on
+  which you can write anything you like (front or back).   </p>
+<p><strong>Test Remark Requests:</strong> must be submitted in writing within two week
+  of when the test was given.  For the third test, requests must be
+  submitted by April 8th 5pm.  </p>
+<p><a href="http://dblab.cs.toronto.edu/~miller/index.php?p=students" sysuid="uid_18"><strong>Office Hours</strong></a></p></div></section>
+
+<section md="yes" sysuid="uid_9" section_number="5."><h1>5. Bookmarks</h1><div><ul>
+<li>
+<p>Please use csc443@cs.toronto.edu for course related email.</p>
+</li>
+<li>
+<p><a href="plus.html">CSC443 Google Plus Page</a></p>
+</li>
+</ul>
+<p><strong>Grade Request Forms</strong></p>
+<ul>
+<li><a href="https://docs.google.com/spreadsheet/viewform?formkey=dGVGaWF1WVVEUUQ2dmdjV2JOTDJjUkE6MQ">Grading of PL1 (closed)<i addclass="disabled" sysuid="uid_19" add-class="disabled" class="instruction"></i></a></li>
+<li><a href="https://docs.google.com/spreadsheet/viewform?formkey=dHJvWHpkeGJ5bHl3TzRoYVNLTjI1ZkE6MQ#gid=0">Grading of PL2 (closed)<i addclass="disabled" sysuid="uid_20" add-class="disabled" class="instruction"></i></a></li>
+<li><a href="https://docs.google.com/forms/d/1ywlr0QWrtnTUoL938ToUlbD24qA7_WG4h6i_gcun1fY/viewform">Grading of PL3 (closed)<i addclass="disabled" sysuid="uid_21" add-class="disabled" class="instruction"></i></a></li>
+<li><a href="https://docs.google.com/forms/d/1U-3CywyyT6VlQDr76-1Fd7Hc1Hm5NsLyGJB0CRxImdE/viewform">Grading of PL4 (closed)<i addclass="disabled" sysuid="uid_22" add-class="disabled" class="instruction"></i></a></li>
+<li><a href="https://docs.google.com/forms/d/10GIuaEEzF3Nx5x_MI1ZPyoMQhzeDIXt6njHmxqF85aE/viewform">Grading of PL5</a></li>
+<li><a href="https://docs.google.com/forms/d/1Dug5u7I1yHtkkG3M_rc5YFG0S8SYEg-rmsipkoj4C7A/viewform">Grading of PL6</a></li>
+</ul></div></section>
+</article>
+    </div>
+
+        <script src="static/3rdparty/jquery-1.8.2.min.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/jquery.jplayer.min.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.player.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/popcorn/popcorn.jplayer.js"></script>
+    <script src="static/3rdparty/prettify/prettify.js"></script>    
+    <script src="static/3rdparty/bootstrap-2.2.2/js/bootstrap.js"></script>
+    <script src="static/3rdparty/sprintf-0.7-beta1.js"></script>
+
+    
+    <script> var piqunity = {staticurl: 'static'}; </script>
+    <script src="static/utils.js"></script>
+    <script src="static/j.actions.js"></script>
+    <script src="static/j.baseevents.js"></script>
+    <script src="static/j.carousel.js"></script>
+    <script src="static/j.media.js"></script>
+    <script src="static/j.nav.js"></script>
+    <script src="static/j.navbar.js"></script>
+    <script src="static/j.program.js"></script>
+    <script src="static/j.quiz.js"></script>
+    <script src="static/j.reading.js"></script>
+    <script src="static/j.ref.js"></script>
+    <script src="static/j.scrollspy.js"></script>
+    <script src="static/j.margin.js"></script>
+
+    <script src="static/piqunity.js"></script>
+    <script>$(function() {
+});
+</script>
+
+    
+
+
+</body>
+</html>

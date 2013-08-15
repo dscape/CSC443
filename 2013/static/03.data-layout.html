@@ -1,0 +1,349 @@
+<!doctype html>
+
+<html>
+<head>
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <link rel='icon' href="static/images/db.png">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap.css">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap-responsive.css">
+    <link rel='stylesheet' href='static/3rdparty/jQuery.jPlayer.2.2.0/skin/blue.monday/jplayer.blue.monday.css'>
+    <link rel='stylesheet' href='static/3rdparty/ligature_symbols/style.css'>
+    <link rel='stylesheet' href='static/3rdparty/prettify/prettify.css'>
+    <link href='static/fonts/PT-serif.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Inconsolata.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Old-Standard-TT.css' rel='stylesheet' type='text/css'>
+
+    <link href='static/piqunity.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-reading.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-lecture.css' rel='stylesheet' type='text/css'>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        messageStyle: 'simple',
+        showMathMenu: false,
+        skipStartupTypeset: false, /* TODO: */
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          skipTags: ["script","noscript","style","textarea"],
+          processEscapes: true
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }},
+        "HTML-CSS": { availableFonts: ["TeX"] }
+      });
+    </script>
+    <script type="text/javascript" src="static/3rdparty/mathjax-2.0/MathJax.js"></script>
+
+    <style>
+    /* default */
+    /* desktop */
+    @media (min-width: 1200px) {
+    }
+    /* tablet */
+    @media (min-width: 768px) and (max-width: 1199px) {
+    }
+    /* phone */
+    @media (max-width: 767px) {
+}
+</style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <title>Relational data on disk</title>
+    <link rel='stylesheet' href='style.css'>
+</head>
+
+<body
+    style='padding-top: 40px;' ## for navbar
+    >
+        
+    <div class='navbar-fixed-top navbar piqunity'>
+        <div class='navbar-inner'>
+            <div class='container'>
+                <a class='brand lsf-icon' title='book' 
+                   href='http://dblab.cs.toronto.edu/courses/443/2013' id='home-link'>
+                    Home
+                </a>
+                <ul class='nav' id='main-navbar'>
+                    <li class='dropdown'>
+                        <a href='03.data-layout.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            TOC <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li><a href="03.data-layout.html#" click="scrollto [sysuid=uid_2]">1. Heap file for pages</a><ul><li><a href="03.data-layout.html#" click="scrollto [sysuid=uid_7]">1.1. Heap file as a linked list</a><ul></ul><li><a href="03.data-layout.html#" click="scrollto [sysuid=uid_8]">1.2. Directory based heap file</a><ul></ul></ul><li><a href="03.data-layout.html#" click="scrollto [sysuid=uid_3]">2. Record serialization</a><ul><li><a href="03.data-layout.html#" click="scrollto [sysuid=uid_9]">2.1. Serializing fixed length records</a><ul></ul><li><a href="03.data-layout.html#" click="scrollto [sysuid=uid_10]">2.2. Serializing variable length records</a><ul></ul></ul><li><a href="03.data-layout.html#" click="scrollto [sysuid=uid_4]">3. Page format</a><ul><li><a href="03.data-layout.html#" click="scrollto [sysuid=uid_12]">3.1. Page format for fixed length records</a><ul></ul><li><a href="03.data-layout.html#" click="scrollto [sysuid=uid_13]">3.2. Page format for variable length records</a><ul></ul></ul><li><a href="03.data-layout.html#" click="scrollto [sysuid=uid_5]">4. Dealing with large records</a><ul><li><a href="03.data-layout.html#" click="scrollto [sysuid=uid_14]">4.1. Motivation for multi-page record storage</a><ul></ul><li><a href="03.data-layout.html#" click="scrollto [sysuid=uid_15]">4.2. Spanned records</a><ul></ul></ul>
+                        </ul>
+                    </li>
+
+                    <li class='dropdown revision'>
+                        <a href='03.data-layout.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            Revisions <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li> Jan 22, 2013: Correction on example </li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a id='navbar-scrollspy'></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class='content'>
+        <article sysuid="uid_0" data-meta='{"title": "Relational data on disk", "revisions": ["Jan 22, 2013: Correction on example"], "author": "CSC 443"}'><section class="coverpage"><h1><span></span>Relational data on disk</h1><h2>CSC 443</h2><p></p></section>
+
+
+<section md="yes" sysuid="uid_2" section_number="1."><h1>1. Heap file for pages</h1><div><p>A <em>heap file</em> is a data structure that holds pages of data.
+Functionally, a heap file is similar to the main memory data
+structure <em>linked list</em>.  It serves as a container of generic data
+items in an unordered fashion.</p>
+<p>Similar to linked list, heap file:</p>
+<ul>
+<li>offers efficient append of new data,</li>
+<li>supports sequential scanning,</li>
+<li>does not offer random access.</li>
+</ul>
+<p>Here are some unique properties of heap file.</p>
+<ul>
+<li>
+<p>Data exists on secondary storage: it's designed to efficient for
+large data volume, with capacity only limited by the available
+secondary storage.</p>
+</li>
+<li>
+<p>A heap file can span over multiple disks or machines: heap file
+can use large addressing schemes to span across multiple disks or
+ever networks.</p>
+</li>
+<li>
+<p>Data is organized into <em>pages</em>.  </p>
+</li>
+<li>
+<p>Pages can be partially empty.</p>
+</li>
+</ul>
+<p>Pages may be segmented over different physical regions of a hard
+drive, or may be scattered over different drives, or even across
+different networks. We simply assume that each page is a unique
+page ID of the type <code>PageAddress</code>, and the operating system can
+locate the page for us.</p>
+<p>Here is a partial interface to a heap file implementation.</p></div><pre lineno="yes" sysuid="uid_6" class="program prettyprint linenums:1">
+class HeapFile {
+    PageIterator scan();
+    PageAddress  allocate();
+    void         deallocate(PageAddress);
+    Page         read(PageAddress);
+    void         write(PageAddress, Page);
+    PageAddress  find_free(int minsize);
+}
+class PageIterator {
+    Page first();
+    boolean hasNext();
+    Page next();
+}
+</pre><div></div><section md="yes" sysuid="uid_7" section_number="1.1."><h1>1.1. Heap file as a linked list</h1><div><p>One may naively implement a disk based linked list.</p></div><center sysuid="uid_16">
+            <img src="data-layout/linked-heapfile.png" sysuid="uid_30">
+        </center><div><p>The problem is that <code>Heapfile::find_free()</code> becomes very
+expensive.  To locate a page with free space (<em>page3</em>), we
+have to scan through the pages (<em>page1</em> and <em>page2</em>).
+Observe, each page traversal is <strong>one</strong> disk I/O, which is
+much too expensive.  </p></div></section><div></div><section md="yes" sysuid="uid_8" section_number="1.2."><h1>1.2. Directory based heap file</h1><div><p>A very simple, yet efficient implementation of a heap file at
+the page level is to use one or more blocks to store the
+directory of all the page addresses and their respective free
+space.</p></div><center sysuid="uid_17">
+            <img src="data-layout/directory-heapfile.png" sysuid="uid_31">
+        </center><div><p>Since <em>page1</em> and <em>page2</em> are both full, their free space
+entries <mathjax>$n_1$</mathjax> and <mathjax>$n_2$</mathjax> will be both zero.</p>
+<p>One still needs to scan through the directory for a free page,
+but it only involves <strong>one</strong> disk I/O for the scan which is
+done in main memory.</p>
+<p>If there are too many pages that the directory itself needs to
+span over multiple pages, we may use a linked list store the
+directory.</p></div><center sysuid="uid_18">
+            <img src="data-layout/directory-heapfile2.png" sysuid="uid_32">
+        </center><div></div><div md="yes" style="border-left: 20px solid #aaa; padding-left: 20px;" step="" class="step" sysuid="uid_19"><div><p>Suppose we have the following parameters:</p></div><table record=":" sysuid="uid_33" class="table-bordered table"><tr sysuid="uid_39"><td sysuid="uid_41">Page size</td><td sysuid="uid_42"> 16 KB</td></tr>
+<tr sysuid="uid_40"><td sysuid="uid_43">                Page address size</td><td sysuid="uid_44"> 32 bits</td></tr>
+</table><div><p>Each entry in the directory would be:
+<mathjax>$$
+\begin{aligned}
+& \mathrm{Bits\ for\ free\ space} + \mathrm{Bits\ for\ page\ address} \\\\
+= & \log_2(16\ KB) + 32= 17 + 32\ bits = 49\ bits \end{aligned}
+$$</mathjax>
+Thus, each directory page can index up to:
+<mathjax>$$ \frac{16\ KB}{49\ bits} = 2674\ pages = 42\ MB $$</mathjax></p></div></div><div></div><div md="yes" side="right" sysuid="uid_20" class="margin margin-right"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_20]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div><div><p>Repeat the calculation for larger page sizes.  </p>
+<p>Derive the directory overhead as a function of the page size.</p></div></div></div></div></div><div></div></section><div></div></section>
+
+<section md="yes" sysuid="uid_3" section_number="2."><h1>2. Record serialization</h1><div><p>We know digress slightly from the disk arrangements to discuss how to convert tuple records into byte arrays.</p></div><section md="yes" sysuid="uid_9" section_number="2.1."><h1>2.1. Serializing fixed length records</h1><div><p>For some relations, all records <em>must</em> be exactly the same length.  For example, consider the relationl schema defined by the following SQL:</p></div><pre sysuid="uid_21" class="program prettyprint linenums:1">
+CREATE TABLE Person1 (
+    name      CHAR(100) NOT NULL,
+    age       INTEGER NOT NULL,
+    birthdate DATETIME NOT NULL
+)
+</pre><div><p>Every records must have a fixed number of bytes:</p>
+<p><code>100 * sizeof(CHAR) + sizeof(INTEGER) + sizeof(DATETIME)</code></p>
+<p>The serialization of <em>fixed length</em> records is as follows:</p></div><center sysuid="uid_22">
+            <img src="data-layout/fixed-record.png" sysuid="uid_34">
+        </center><div><p>From the schema, we can examine the sizes of each field, and thus decode the byte array into individual fields.</p></div></section><div></div><section md="yes" sysuid="uid_10" section_number="2.2."><h1>2.2. Serializing variable length records</h1><div><p>Suppose that we modify the <code>Person1</code> table so that the name can have any number, up to 1024, of characters.  The schema becomes:</p></div><pre sysuid="uid_23" class="program prettyprint linenums:1">
+CREATE TABLE Person2 (
+    name      VARCHAR(1024) NOT NULL,
+    age       INTEGER NOT NULL,
+    birthdate DATETIME
+)
+</pre><div><p>Records of the table defined above are <em>variable length</em> because:</p>
+<ul>
+<li><code>name</code> field can have variable number of characters.</li>
+<li><code>birthdate</code> can be omitted from the record.</li>
+</ul>
+<p>The key idea in serializing variable length records is to encode the field boundaries.  A popular method is to encode the <em>offsets</em> of the field boundaries in the header.</p>
+<p>The encoding of a record in <code>Person2</code> is as follows.</p></div><center sysuid="uid_24">
+            <img src="data-layout/var-record.png" sysuid="uid_35">
+        </center><div><p>Note: We now have <em>four</em> integers in the header which are the offsets of the four boundaries of the three fields in the record.</p>
+<p>Having these boundary offsets provides a natural way of encoding NULL valued fields -- they can be viewed as fields with zero bytes, as shown in the following figure.</p></div><center sysuid="uid_25">
+            <img src="data-layout/null-record.png" sysuid="uid_36">
+        </center><div><p>Given that <em>third</em> offset pointer and the <em>fourth</em> offset pointer are the same, we can deduce that the third field having zero size, hence has a NULL value. </p></div></section><div></div></section>
+
+<section md="yes" sysuid="uid_4" section_number="3."><h1>3. Page format</h1><div><p>We now complete the description of the data layout on disk with how data is formatted in each page.</p>
+<p>We make a simplifications in the design:</p></div><center><div font="bold" sysuid="uid_11" style="max-width: 600px;width: 100%;font-weight: bold">
+    Every page stores tuples with the same schema.
+    </div></center><div><p>The simplification has two important consequences:</p>
+<ol>
+<li>Every relation (table) occupies at least one page.</li>
+<li>Page contains either fixed length tuples or variable length records.</li>
+</ol>
+<p>There are two variations to the page format: one for fixed length record, and one for variable length record.  The properties of the page formats which are important to the database management system are:</p>
+<ol>
+<li>efficiently utilize disk space.</li>
+<li>support scan, insert, delete and modify of records efficiently with minimal incurred disk I/O.</li>
+<li>there is an efficient way of assigning unique ID's to records.   The assigned record ID's should be remain invariant to database updates including insertion, deletion and modifications of the records.</li>
+<li>each record fits into a page.  This will be relaxed in <strong>later section</strong>.</li>
+</ol></div><section md="yes" sysuid="uid_12" section_number="3.1."><h1>3.1. Page format for fixed length records</h1><div><p>It's relatively easy to organize fixed length records in a page. A common technique is to partition the initial segment of a page into <mathjax>$M$</mathjax> <em>slots</em> of equal size.  Each slot fits <em>one</em> record.  The last segment of a page consists of an integer to store the value <mathjax>$M$</mathjax>, and <mathjax>$M$</mathjax> bits to indicate if the respective slot is occupied or free.</p></div><center sysuid="uid_26">
+            <img src="data-layout/fixed-page.png" sysuid="uid_37">
+        </center><div><p>Pages with fixed length records are particularly simple to maintain.</p>
+<p><strong>Record ID</strong></p>
+<p>The record ID of a record <mathjax>$r$</mathjax> in page <mathjax>$P$</mathjax> can be the catenation <mathjax>$\left&lt;\mathrm{pid}(P), \mathrm{offset}(r)\right&gt;$</mathjax>.</p>
+<p>The very important property of the record ID assignment is that a record's ID is persistent -- in that it will never be affected by changes to the database.  Furthermore, the record ID is sufficient for the database to locate the record physically on disk.</p>
+<p><strong>Create new record</strong></p>
+<p>To insert a record <mathjax>$r$</mathjax> into a page <mathjax>$P$</mathjax>,</p>
+<ol>
+<li>read <mathjax>$M$</mathjax> from the last <code>sizeof(int)</code> bytes in <mathjax>$P$</mathjax>.</li>
+<li>Then scan the <mathjax>$M$</mathjax> bits backwards.</li>
+<li>If all the bits are <code>1</code>, then there is <em>no</em> room in the page for <mathjax>$r$</mathjax>.</li>
+<li>If the <mathjax>$k$</mathjax>-th bit (from the end) is <code>0</code>, then <mathjax>$r$</mathjax> can be safely written to <mathjax>$P[nk : n(k+1)]$</mathjax> where <mathjax>$n=\mathrm{sizeof}(r)$</mathjax>.  Set the <mathjax>$k$</mathjax>-th bit to <code>1</code>.</li>
+</ol>
+<p><strong>Modify record</strong></p>
+<p>To modify a record, we can simply overwrite the old record with the new value.  This can be done because the record boudaries are not affected by the values of the records.</p>
+<p><strong>Delete record</strong></p>
+<p>Deleting the record simply means to set the corresponding bit in the bit index to <code>0</code>.</p></div></section><div></div><section md="yes" sysuid="uid_13" section_number="3.2."><h1>3.2. Page format for variable length records</h1><div><p>Variable length records are much more difficult to maintain in a page for the following reasons:</p>
+<ol>
+<li>The record boundaries and field boundaries are dependent on the data content.</li>
+<li>When the data is modified, record size may change, resulting in physical relocation of the record.  This requires efficient methods to move records in a page (or between pages).</li>
+<li>If record ID needs to be maintained, the record ID assignment must be invariant even if the record is to be moved.</li>
+</ol>
+<p>One efficient design is to maintain a page header which tracks the free space and a <em>directory</em> of records.</p></div><center sysuid="uid_27">
+            <img src="data-layout/var-page.png" sysuid="uid_38">
+        </center><div><p><strong> Record ID assignment </strong></p>
+<p>The record ID of a record is the catenation of the page ID and the directory index.</p>
+<p><strong> Create new record </strong></p>
+<p>To insert a new record <mathjax>$r$</mathjax> to page <mathjax>$P$</mathjax>:</p>
+<ol>
+<li>make sure the free space in <mathjax>$P$</mathjax> can hold <code>sizeof($r$)</code>, and the new entry in the record directory (<code>sizeof(offset) + sizeof(int)</code>).</li>
+<li>copy <mathjax>$r$</mathjax> to the start of free space.</li>
+<li>update the record directory to record the offset of <mathjax>$r$</mathjax> in <mathjax>$P$</mathjax> and its size.</li>
+<li>update the free space pointer in the page header.</li>
+</ol>
+<p><strong> Delete a record </strong></p>
+<p>To delete the <mathjax>$i$</mathjax>-th record, <mathjax>$r_i$</mathjax>, in <mathjax>$P$</mathjax>:</p>
+<ol>
+<li>if <mathjax>$i$</mathjax> is the last entry in the record directory, delete directory entry <mathjax>$i$</mathjax>, and update the free space pointer to the offset of <mathjax>$r_i$</mathjax>.</li>
+<li>if <mathjax>$i$</mathjax> is not the last entry, we update update directory entry <mathjax>$i$</mathjax> to be:
+<mathjax>$\mathrm{offset}(r_i) = -1$</mathjax>.  This marks <mathjax>$r_i$</mathjax> to be deleted.</li>
+</ol></div><center><div md="yes" step="" sysuid="uid_28" style="max-width: 600px;width: 100%"><div><p><strong>NOTE</strong>:</p>
+<ol>
+<li>
+<p>we cannot delete the directory entry in general during deletion because it will affect the directory indices of other records, which in turn destroys the invariance property of record IDs.  Recall that the directory index is used as part of the record ID which must remain unaffected by database updates.</p>
+</li>
+<li>
+<p>Deletion leaves <em>holes</em> in the page.  The space occupied by deleted records cannot be reclaimed <em>unless</em> we reorganize the page such that all space before the free space pointer are contiguously occupied.  This is called <em>compacting</em> the page.</p>
+</li>
+</ol></div></div></center><div><p><strong> Modify a record </strong></p>
+<p>Let <mathjax>$r$</mathjax> be the old value, and <mathjax>$r'$</mathjax> be the new value.  Let <mathjax>$i$</mathjax> be the directory index of <mathjax>$r$</mathjax>.</p>
+<p>if <mathjax>$|r'|\leq |r|$</mathjax>, write <mathjax>$r'$</mathjax> to <mathjax>$\mathrm{offset}_i$</mathjax>, and update the directory entry <mathjax>$i$</mathjax> with the new <code>sizeof($r'$)</code>.</p>
+<p>if <mathjax>$|r'| &gt; |r|$</mathjax>:</p>
+<ul>
+<li>
+<p>if there is enough free space in <mathjax>$P$</mathjax> to hold <mathjax>$r'$</mathjax>, then:</p>
+<ol>
+<li>insert <mathjax>$r'$</mathjax> in the free space of <mathjax>$P$</mathjax></li>
+<li>update the <mathjax>$\mathrm{offset}_i$</mathjax> to be the new offset of <mathjax>$r'$</mathjax>.</li>
+<li>update the free pointer.</li>
+</ol>
+</li>
+<li>
+<p>if there is not enough space, try to compact the page.</p>
+</li>
+<li>
+<p>if there is not enough space <em>after</em> compacting the page,</p>
+<ol>
+<li>allocate a <em>new</em> page, and write <mathjax>$r'$</mathjax> to the new page.  But since <mathjax>$r'$</mathjax> is on a different page, it has a different record ID.</li>
+<li>modify <mathjax>$r$</mathjax> such that it becomes a <em>forwarding</em>
+record.  The content of <mathjax>$r$</mathjax> only contains header
+information indicating that it is a forwarding record,
+and the record ID of <mathjax>$r'$</mathjax>.</li>
+</ol>
+</li>
+</ul></div><center><div md="yes" step="" sysuid="uid_29" style="max-width: 600px;width: 100%"><div><p><strong>NOTE</strong></p>
+<ol>
+<li>If a page <mathjax>$P$</mathjax> has <mathjax>$N$</mathjax> records, there must always be enough free space reserved on a page to store at least <mathjax>$N$</mathjax> forwarding records.</li>
+<li>When the database looks for a record by its ID, it may need multiple disk IO if forwarding is encountered.</li>
+</ol></div></div></center><div></div></section><div></div></section>
+
+<section md="yes" sysuid="uid_5" section_number="4."><h1>4. Dealing with large records</h1><div><p>In this section, we focus on methods of storing one record in multiple pages.</p></div><section md="yes" sysuid="uid_14" section_number="4.1."><h1>4.1. Motivation for multi-page record storage</h1><div><p>An obvious motivation is when a record is <em>too</em> large to fit into one page.  Record fields which are designed to store large objects such as files, multimedia, etc., are known as <em>binary large objects</em>, or <em>BLOB</em>.  Almost certainly, BLOB records must span over multiple disk pages.</p>
+<p>Another reason for storing one record over multiple pages is to avoid segmentation.  Consider <em>fixed length</em> records whose size is slightly less than 50% of page size.  According to the page format for fixed length records, each page have <em>one</em> slot, thus wasting almost half of its space.In that case, it would be beneficial to store partial record.</p></div></section><div></div><section md="yes" sysuid="uid_15" section_number="4.2."><h1>4.2. Spanned records</h1><div><ul>
+<li>If a record is stored over multiple pages, we say it is <em>spanned</em>.  Otherwise, it is <em>unspanned</em>.</li>
+<li>Spaned records are <em>fragmented</em> into <em>record fragments</em>.  Each record fragment is on a separate page.</li>
+<li>Each record must have <em>one</em> bit to indicate if it is spanned or unspanned.</li>
+<li>Each record fragment contains the address of the next record fragment to allow the retrieval of the entire spanned record.</li>
+</ul></div></section><div></div></section>
+
+
+</article>
+    </div>
+
+        <script src="static/3rdparty/jquery-1.8.2.min.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/jquery.jplayer.min.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.player.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/popcorn/popcorn.jplayer.js"></script>
+    <script src="static/3rdparty/prettify/prettify.js"></script>    
+    <script src="static/3rdparty/bootstrap-2.2.2/js/bootstrap.js"></script>
+    <script src="static/3rdparty/sprintf-0.7-beta1.js"></script>
+
+    
+    <script> var piqunity = {staticurl: 'static'}; </script>
+    <script src="static/utils.js"></script>
+    <script src="static/j.actions.js"></script>
+    <script src="static/j.baseevents.js"></script>
+    <script src="static/j.carousel.js"></script>
+    <script src="static/j.media.js"></script>
+    <script src="static/j.nav.js"></script>
+    <script src="static/j.navbar.js"></script>
+    <script src="static/j.program.js"></script>
+    <script src="static/j.quiz.js"></script>
+    <script src="static/j.reading.js"></script>
+    <script src="static/j.ref.js"></script>
+    <script src="static/j.scrollspy.js"></script>
+    <script src="static/j.margin.js"></script>
+
+    <script src="static/piqunity.js"></script>
+    <script>$(function() {
+});
+</script>
+
+    
+
+
+</body>
+</html>

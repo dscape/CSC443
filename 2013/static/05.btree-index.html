@@ -1,0 +1,427 @@
+<!doctype html>
+
+<html>
+<head>
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <link rel='icon' href="static/images/db.png">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap.css">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap-responsive.css">
+    <link rel='stylesheet' href='static/3rdparty/jQuery.jPlayer.2.2.0/skin/blue.monday/jplayer.blue.monday.css'>
+    <link rel='stylesheet' href='static/3rdparty/ligature_symbols/style.css'>
+    <link rel='stylesheet' href='static/3rdparty/prettify/prettify.css'>
+    <link href='static/fonts/PT-serif.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Inconsolata.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Old-Standard-TT.css' rel='stylesheet' type='text/css'>
+
+    <link href='static/piqunity.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-reading.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-lecture.css' rel='stylesheet' type='text/css'>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        messageStyle: 'simple',
+        showMathMenu: false,
+        skipStartupTypeset: false, /* TODO: */
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          skipTags: ["script","noscript","style","textarea"],
+          processEscapes: true
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }},
+        "HTML-CSS": { availableFonts: ["TeX"] }
+      });
+    </script>
+    <script type="text/javascript" src="static/3rdparty/mathjax-2.0/MathJax.js"></script>
+
+    <style>
+    /* default */
+    
+    .carousel img { height: 300px; }
+
+    
+                    .uid_44 img {
+                        height: 300px;
+                    }
+                    
+    /* desktop */
+    @media (min-width: 1200px) {
+    }
+    /* tablet */
+    @media (min-width: 768px) and (max-width: 1199px) {
+    }
+    /* phone */
+    @media (max-width: 767px) {
+}
+</style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <title>B+ tree index</title>
+    <link rel='stylesheet' href='style.css'>
+</head>
+
+<body
+    style='padding-top: 40px;' ## for navbar
+    >
+        
+    <div class='navbar-fixed-top navbar piqunity'>
+        <div class='navbar-inner'>
+            <div class='container'>
+                <a class='brand lsf-icon' title='book' 
+                   href='http://dblab.cs.toronto.edu/courses/443/2013' id='home-link'>
+                    Home
+                </a>
+                <ul class='nav' id='main-navbar'>
+                    <li class='dropdown'>
+                        <a href='05.btree-index.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            TOC <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li><a href="05.btree-index.html#" click="scrollto [sysuid=uid_3]">1. Overview of B+ tree</a><ul></ul><li><a href="05.btree-index.html#" click="scrollto [sysuid=uid_4]">2. Definition of B+ tree</a><ul><li><a href="05.btree-index.html#" click="scrollto [sysuid=uid_7]">2.1. Leaf nodes</a><ul></ul><li><a href="05.btree-index.html#" click="scrollto [sysuid=uid_8]">2.2. Interior nodes</a><ul></ul><li><a href="05.btree-index.html#" click="scrollto [sysuid=uid_9]">2.3. Constraints and properties of B+ tree</a><ul></ul></ul><li><a href="05.btree-index.html#" click="scrollto [sysuid=uid_5]">3. B+ Tree Search and Insertion</a><ul><li><a href="05.btree-index.html#" click="scrollto [sysuid=uid_11]">3.1. Searching</a><ul></ul><li><a href="05.btree-index.html#" click="scrollto [sysuid=uid_12]">3.2. Inserting</a><ul><li><a href="05.btree-index.html#" click="scrollto [sysuid=uid_27]">3.2.1. Case 1</a><ul></ul><li><a href="05.btree-index.html#" click="scrollto [sysuid=uid_28]">3.2.2. Case 2</a><ul></ul><li><a href="05.btree-index.html#" click="scrollto [sysuid=uid_29]">3.2.3. Case 3</a><ul></ul></ul></ul><li><a href="05.btree-index.html#" click="scrollto [sysuid=uid_6]">4. Other things about B+ Tree</a><ul></ul>
+                        </ul>
+                    </li>
+
+                    <li class='dropdown revision'>
+                        <a href='05.btree-index.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            Revisions <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li> 2012/12/22: Creation </li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a id='navbar-scrollspy'></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class='content'>
+        <article sysuid="uid_0" data-meta='{"title": "B+ tree index", "revisions": ["2012/12/22: Creation"], "author": "CSC 443"}' class="uid_0"><section class="coverpage"><h1><span></span>B+ tree index</h1><h2>CSC 443</h2><p></p></section>
+
+
+<section md="yes" sysuid="uid_3" section_number="1."><h1>1. Overview of B+ tree</h1><div><p>In the <a href="04.basic-index.html">previous article</a>, we discussed several
+important things about indexing:</p>
+<ol>
+<li>
+<p>Indexes are disk based data structures to speed up record search (and /
+or scan)</p>
+</li>
+<li>
+<p>Organizing page pointers into sorted index tree structures speeds up record
+search.
+(<a href="04.basic-index.html#isam">ISAM</a>)</p>
+</li>
+<li>
+<p>Maintaining sortedness of the index tree is expensive, so we may create
+overflow pages in ISAM, but the overflow pages degrade search performance
+from <mathjax>$\log$</mathjax> to linear scan.</p>
+</li>
+</ol>
+<p>We will introduce a highly robust and popular data structure B+ tree, which
+is an extension of ISAM.</p>
+<p>Generally speaking, a B+ tree is an efficient disk based data structure that
+stores (<em>key</em> / <em>value</em>) pairs.  It supports very efficient lookup by key,
+and iteration of entries in the range of two specified key values.</p>
+<p>B+ tree offers:</p>
+<ul>
+<li>fast record search</li>
+<li>fast record traversal</li>
+<li>maintaining sorted tree structure without overflow pages</li>
+</ul>
+<p>The key idea behind B+ tree is that it utilizes <em>balanced sorted tree</em> of
+page pointers, as opposed to just sorted tree in the case of ISAM.</p></div></section>
+
+<section md="yes" sysuid="uid_4" section_number="2."><h1>2. Definition of B+ tree</h1><div><p>A B+ tree is a tree whose nodes are pages on disk.  We will distinguish the
+<em>leaf nodes</em> and the <em>interior nodes</em> of a B+ tree.</p>
+<p>Since each node is exactly one disk page, in the context of B+ tree, we use
+the term <em>page</em> and <em>node</em> interchangably.</p></div><section md="yes" sysuid="uid_7" section_number="2.1."><h1>2.1. Leaf nodes</h1><div><p>The leaf nodes store the data entries in the form of (key, value).
+All leaf nodes are also organized into an linked list of pages.
+Leaf nodes of a B+ tree can be visualized as follows.</p></div><center><div sysuid="uid_13" style="max-width: 600px;width: 100%">
+            <img src="btree-index/leaf-node.png" sysuid="uid_30">
+            <center sysuid="uid_31"> A leaf node </center>
+        </div></center><div><p>The following data structure abstracts the leaf nodes.</p></div><pre lineno="" sysuid="uid_14" class="program prettyprint">
+struct LeafNode {
+    vector&lt;Key&gt; keys;
+    vector&lt;Value&gt; values;
+    PagePointer next_page;
+}
+</pre><div><p>We can always assert that</p>
+<p><code>p.keys.size() == p.values.size()</code> for all nodes <code>p</code>.</p></div></section><div></div><section md="yes" sysuid="uid_8" section_number="2.2."><h1>2.2. Interior nodes</h1><div><p>The interior nodes form a tree structure, starting from a root node, to
+speed up lookup of <em>the</em> leaf node that contains a key of interest.</p>
+<p>The structure of an interior node can be visualized as a sequence of
+alternating page pointers and keys.</p></div><center><div sysuid="uid_15" style="max-width: 600px;width: 100%">
+            <img src="btree-index/interior-node.png" sysuid="uid_32">
+            <center sysuid="uid_33">An interior node</center>
+        </div></center><div><p>The following data structure abstracts the interior nodes:</p></div><pre lineno="" sysuid="uid_16" class="program prettyprint">
+struct InteriorNode {
+    vector&lt;Key&gt; keys;
+    vector&lt;PagePointer&gt; pointers;
+}
+</pre><div><p>We can always assert that <code>p.keys.size() +1 == p.pointers.size()</code>.</p>
+<p><strong>Definition</strong>: Neighbouring pointers </p></div><center><div md="yes" sysuid="uid_17" style="max-width: 600px;width: 100%"><div><p>Give a key <mathjax>$k_i$</mathjax>, we define <mathjax>$\mathrm{before}(k_i)$</mathjax> to be the page pointer
+before <mathjax>$k_i$</mathjax>, and <mathjax>$\mathrm{after}(k_i)$</mathjax> the page pointer after <mathjax>$k_i$</mathjax>.</p>
+<p>Namely, </p>
+<ul>
+<li><code>p.before($k_i$) = p.pointers[i]</code></li>
+<li><code>p.after($k_i$) = p.pointers[i+1]</code></li>
+</ul></div></div></center><div></div></section><div></div><section md="yes" sysuid="uid_9" section_number="2.3."><h1>2.3. Constraints and properties of B+ tree</h1><div><p><u sysuid="uid_18">Keys are sorted in the nodes.</u></p>
+<p>Let <code>p</code> be a node in B+ tree.  We need to maintain that
+<code>p.keys</code> is sorted by the key values.</p>
+<p><u sysuid="uid_19">Nodes are sorted by their keys</u></p>
+<p>B+ tree is a sorted tree in the following sense:</p>
+<ul>
+<li>
+<p>Leaf nodes are sorted:</p>
+<p><mathjax>$$ \forall p\in\mathrm{LeafNode},\;
+   \forall k\in p.\mathrm{keys},\;
+   \forall k'\in p.\mathtt{next\_page.keys},\;
+   k \lt k' $$</mathjax></p>
+<p>The sorted linked list of leaf nodes allows very efficient traveral of (key,
+value) pairs between two leaf nodes.</p>
+</li>
+<li>
+<p>Interior nodes are sorted:</p>
+<p>B+ tree asserts that for all key <mathjax>$k$</mathjax> and the adjacent pointers,
+<mathjax>$\mathrm{after}(k)$</mathjax> and <mathjax>$\mathrm{after}(k)$</mathjax>, it must be that:</p>
+<ul>
+<li><mathjax>$k \gt \max(\mathrm{keys}(\mathrm{before}(k))) $</mathjax></li>
+<li><mathjax>$k \leq \min(\mathrm{keys}(\mathrm{after}(k))) $</mathjax></li>
+</ul>
+<p>In other words, <mathjax>$k$</mathjax> is the key that divides the keys in
+pages <mathjax>$\mathrm{before}(k)$</mathjax> and <mathjax>$\mathrm{after}(k)$</mathjax>.</p>
+</li>
+</ul></div><center><div sysuid="uid_20" style="max-width: 600px;width: 100%">
+                <img src="btree-index/split-keys.png" sysuid="uid_34">
+            </div></center><div><p><u sysuid="uid_21">The tree is balanced</u></p>
+<p>B+ tree is a balanced tree, so all paths from the root to the leaf nodes
+must be of equal length.</p>
+<p><u sysuid="uid_22">The nodes are sufficiently filled.</u></p>
+<p>B+ tree permits nodes to be partially filled.  As a design parameter, B+
+tree specifies a percentage, known as the <em>fill factor</em> of the tree,
+that controls the <em>minimal</em> occupacity of all the <strong>non-root</strong> nodes.</p>
+<p>If a non-root node is too empty, we say it has an <em>underflow</em>.  Only the
+root node can have an underflow.</p>
+<p>Here is an example of a problematic B+ tree.  Suppose we have the following parameters:</p>
+<pre><code>    Capacity of each node: 4 keys
+    Fill factor: 50%
+</code></pre>
+<p>While the tree is balanced and sorted, it does not satisfy the
+fill-factor.</p></div><div center="yes" class="overlay carousel slide" height="300px" sysuid="uid_23" id="uid_23" style="height: 300px;text-align: center">
+            
+            
+        <div class="carousel-inner"><div class="item active"><img src="btree-index/filled-tree-1.png" sysuid="uid_35" height="300px" style="height: 300px"></div><div class="item"><img src="btree-index/filled-tree-2.png" sysuid="uid_36" height="300px" style="height: 300px"></div></div><a href="05.btree-index.html#uid_23" class="carousel-control left">&lsaquo;</a><a href="05.btree-index.html#uid_23" class="carousel-control right">&rsaquo;</a></div><div></div></section><div></div></section>
+
+<section md="yes" sysuid="uid_5" section_number="3."><h1>3. B+ Tree Search and Insertion</h1><div><p>The main operations on B+ tree are:</p></div><pre class="dark program prettyprint" lineno="" sysuid="uid_10">
+/**
+ * finds the leaf node that _should_ contain the entry with the specified key
+ */
+LeafNode search(Node root, Key key)
+
+/**
+ * Inserts a key/val pair into the tree.
+ * Returns the root of the new tree which _may_ be different
+ * from the old root node.
+ */
+InteriorNode insert_into_tree(InteriorNode root, Key newkey, Value val)
+</pre><div><p>The algorithm for <code>insert</code> must ensure that the
+properties of the B+ tree are preserved after the respective operation.</p></div><section md="yes" sysuid="uid_11" section_number="3.1."><h1>3.1. Searching</h1><div><p>The B+ tree search algorithm is a straight-forward tree traveral
+algorithm.</p></div><pre lineno="" sysuid="uid_24" class="program prettyprint">
+LeafNode search(Node p, Key key) {
+    if(p is LeafNode)
+        return root;
+    else {
+        if(key &lt; p.keys[0])
+            return search(before(p.keys[0]), key);
+        else if(key &gt; p.keys[-1])
+            return search(after(p.keys[-1]), key);
+        else {
+            let i be p.keys[i] &lt;= key &lt; p.keys[i+1]
+            return search(after(p.keys[i]), key)
+        }
+    }
+}
+</pre><div></div></section><div></div><section md="yes" sysuid="uid_12" section_number="3.2."><h1>3.2. Inserting</h1><div><p>Insertion into a B+ tree is quite tricky.  Unlike the
+<a href="http://en.wikipedia.org/wiki/AVL_tree#Insertion">algorithm</a> for
+insertion into a balanced sorted binary tree, the B+ tree insertion needs to
+deal with node overflows and underflows.</p>
+<p>The insertion algorithm starts with:</p>
+<ul>
+<li>look for the right leaf for insertion</li>
+<li>try to insert into the leaf node</li>
+</ul></div><pre lineno="" sysuid="uid_25" class="program prettyprint">
+InteriorNode insert_into_tree(InteriorNode root, Key newkey, Value val) {
+    LeafNode leaf = search(root, newkey);
+    return insert_into_node(leaf, newkey, val);
+}
+</pre><div><p>The insertion algorithm, <code>insert_into_node</code>, looks something like this:</p></div><pre lineno="" sysuid="uid_26" class="program prettyprint">
+/**
+ * Tries to inserts the (newkey/val) pair into
+ * the node.
+ *
+ * If `target` is an interior node, then `val` must be a page pointer.
+ */
+InteriorNode insert_into_node(Node target, newkey, val) 
+{
+    if( ... CASE 1 ... ) {
+        /* handle CASE 1 */
+    } else if( ... CASE 2 ... ) {
+        /* handle CASE 2 */
+    } else if( ... CASE 3 ... ) {
+        /* handle CASE 2 */
+    }
+}
+</pre><div><p>The tree distinct cases are:</p>
+<ol>
+<li>the target node has available space for one more key.</li>
+<li>the target node is full, but its parent has space for one more key.</li>
+<li>the target node and its parent are both full.</li>
+</ol></div><section md="yes" sysuid="uid_27" section_number="3.2.1."><h1>3.2.1. Case 1</h1><div><p>This is the easiest case.  Simply insert the entry (newkey, val)
+into <code>target</code>.</p>
+<ul>
+<li>The root of the B+ tree does not change.</li>
+<li>We have not discussed the disk I/O operations involved.  Since all the
+node operations operate on one page at a time, the 
+<a href="02.memory-hierarchy.html#buffermanager">buffer manager</a>
+can be used to provide the transparent virtual memory, as if all the
+nodes are stored in memory.</li>
+</ul></div><ul class="nav nav-tabs"><li class="active"><a href="05.btree-index.html#uid_37" data-toggle="tab">Example</a></li></ul><div class="tab-content"><div sysuid="uid_37" active="yes" class="tab-pane fade in active" id="uid_37">
+                <div style="border: thin solid black;text-align: center" center="yes" sysuid="uid_44" class="uid_44 carousel slide" id="uid_44">
+                    
+                    
+                    
+                    
+                <div class="carousel-inner"><div class="item active"><div sysuid="uid_48"><div><p><img src="btree-index/example/initial.png" sysuid="uid_63" left="yes" class="left embedded"></p>
+<p>(1): Suppose this is the initial tree.  We are to insert (28,
+val) into this tree.</p></div></div></div><div class="item"><div sysuid="uid_49"><div><p><img src="btree-index/example/insert-28-1.png" sysuid="uid_64" left="yes" class="left embedded"></p>
+<p>(2): Locating the insertion leaf target.</p></div></div></div><div class="item"><div sysuid="uid_50"><div><p><img src="btree-index/example/insert-28-2.png" sysuid="uid_65" left="yes" class="left embedded"></p>
+<p>(3): Insertion complete.</p></div></div></div></div><a href="05.btree-index.html#uid_44" class="carousel-control left">&lsaquo;</a><a href="05.btree-index.html#uid_44" class="carousel-control right">&rsaquo;</a></div>
+            </div></div><div></div></section><div></div><section md="yes" sysuid="uid_28" section_number="3.2.2."><h1>3.2.2. Case 2</h1><div><p>In this case, the target node is full, but its parent node has available
+space for at least one more key.</p>
+<ul>
+<li>Create a new sibling node to target, call it <code>new_target</code>, and
+insert it <em>after</em> <code>target</code>.</li>
+<li>Distribute the data entries between <code>target</code> and <code>new_target</code>.
+From the assumption that <code>target</code> is full, we can safely assert that
+after distribution, there will be no underflow.</li>
+<li><code>new_target</code> must be pointed to by <code>(k,p) = (leaf2.keys[0],
+ADDRESS[leaf2])</code> in <code>PARENT[target]</code>.  So
+<code>(k,p)</code> are to be inserted into <code>PARENT[leaf]</code>.  By assumption, we know
+that <code>PARENT[leaf]</code> will not overflow.</li>
+</ul></div><ul class="nav nav-tabs"><li class="active"><a href="05.btree-index.html#uid_38" data-toggle="tab">Example</a></li></ul><div class="tab-content"><div md="yes" sysuid="uid_38" active="yes" class="tab-pane fade in active" id="uid_38"><div><p>Let's continue with the previous example, and try to insert (70,
+val).</p></div><div style="border: thin solid black;text-align: center" center="yes" sysuid="uid_45" class="carousel slide" id="uid_45">
+                    
+                    
+                    
+                    
+                    
+                    
+                <div class="carousel-inner"><div class="item active"><div sysuid="uid_51"><div><p><img src="btree-index/example/insert-28-2.png" sysuid="uid_66" left="yes" class="left embedded"></p>
+<p>(1): We now insert an entry with key = 70.</p></div></div></div><div class="item"><div sysuid="uid_52"><div><p><img src="btree-index/example/insert-70-1.png" sysuid="uid_67" left="yes" class="left embedded"></p>
+<p>(2): We locate the insertion leaf node, but it's full.</p></div></div></div><div class="item"><div sysuid="uid_53"><div><p><img src="btree-index/example/insert-70-2.png" sysuid="uid_68" left="yes" class="left embedded"></p>
+<p>(3): We need to create new node and distribute the keys
+evenly.</p></div></div></div><div class="item"><div sysuid="uid_54"><div><p><img src="btree-index/example/insert-70-3.png" sysuid="uid_69" left="yes" class="left embedded"></p>
+<p>(4): The new node creates a <code>(Key, PagePointer)</code> pair
+to be inserted into the parent.</p></div></div></div><div class="item"><div sysuid="uid_55"><div><p><img src="btree-index/example/insert-70-4.png" sysuid="uid_70" left="yes" class="left embedded"></p>
+<p>(5): The parent has a vacancy, so <code>(Key, PagePointer)</code> can
+be simply inserted.</p></div></div></div><div class="item"><div sysuid="uid_56"><div><p><img src="btree-index/example/insert-70-5.png" sysuid="uid_71" left="yes" class="left embedded"></p>
+<p>(6): Insertion of (70, val) completes.</p></div></div></div></div><a href="05.btree-index.html#uid_45" class="carousel-control left">&lsaquo;</a><a href="05.btree-index.html#uid_45" class="carousel-control right">&rsaquo;</a></div><div></div></div></div><div></div></section><div></div><section md="yes" sysuid="uid_29" section_number="3.2.3."><h1>3.2.3. Case 3</h1><div><p>This is the case that both <code>target</code> and <code>PARENT[target]</code> are full.
+We have to recursively attempt to insert the new key into the
+ancestors of <code>target</code>.  It is possible that even the root does not have
+sufficient space for the new key, in which case we must split the
+root, and create a new root node of the B+ tree.</p>
+<p>The details are as follows:</p>
+<ol>
+<li>Create <code>new_target</code> node, and insert it after <code>target</code>.</li>
+<li>Distribute data entries among <code>target</code> and <code>new_target</code>.</li>
+</ol>
+<p>Now, let <code>k = leaf2.keys[0]</code> and <code>p = ADDRESS[leaf2]</code>.  We need to
+insert <code>(k,p)</code> into <code>PARENT[leaf]</code>, which is full.</p>
+<ol>
+<li>Let <code>target_parent = PARENT[target]</code></li>
+<li>Let <code>all_keys = sorted(target_parent.keys $\cup$ {k})</code></li>
+<li>Allocate new node <code>new_interior</code></li>
+<li>Let <code>i = floor(all_keys.size() / 2)</code>.<br sysuid="uid_39">
+   Let <code>middle_key = all_keys[i]</code></li>
+<li>Distribute <code>all_keys[0 .. i-1]</code> to <code>target_parent</code>, and <br sysuid="uid_40">
+   Distribute <code>all_keys[i+1 .. n]</code> to <code>new_interior</code>.</li>
+<li>If <code>target_parent</code> is the root, then let <code>grandparent</code> be a newly allocated node.  <br sysuid="uid_41">
+   Otherwise, <code>grandparent = PARENT[target_parent]</code>.</li>
+<li>Recursively call:<br sysuid="uid_42">
+   <code>insert_into_node(grandparent, middle_key, ADDRESS[new_interior])</code></li>
+</ol></div><ul class="nav nav-tabs"><li class="active"><a href="05.btree-index.html#uid_43" data-toggle="tab">Example</a></li></ul><div class="tab-content"><div sysuid="uid_43" active="yes" class="tab-pane fade in active" id="uid_43">
+                <div style="border: thin solid black;text-align: center" center="yes" sysuid="uid_46" class="carousel slide" id="uid_46">
+                    
+                    
+                    
+                    
+                    
+                    
+                <div class="carousel-inner"><div class="item active"><div sysuid="uid_57"><div><p><img src="btree-index/example/insert-95-1.png" sysuid="uid_72" left="yes" class="left embedded"></p>
+<p>(1): We try to insert (95, ...) into this tree.</p></div></div></div><div class="item"><div sysuid="uid_58"><div><p><img src="btree-index/example/insert-95-2.png" sysuid="uid_73" left="yes" class="left embedded"></p>
+<p>(2): The leaf node is full.</p></div></div></div><div class="item"><div sysuid="uid_59"><div><p><img src="btree-index/example/insert-95-3.png" sysuid="uid_74" left="yes" class="left embedded"></p>
+<p>(3): As in CASE 2, we create a new leaf node and
+distribute the keys evenly.</p></div></div></div><div class="item"><div sysuid="uid_60"><div><p><img src="btree-index/example/insert-95-4.png" sysuid="uid_75" left="yes" class="left embedded"></p>
+<p>(4): Here, the parent interior node is also full.</p></div></div></div><div class="item"><div sysuid="uid_61"><div><p><img src="btree-index/example/insert-95-5.png" sysuid="uid_76" left="yes" class="left embedded"></p>
+<p>(5): We split the parent interior node, and distribute
+the keys before and after the <em>middle key</em>.</p></div></div></div><div class="item"><div sysuid="uid_62"><div><p><img src="btree-index/example/insert-95-6.png" sysuid="uid_77" left="yes" class="left embedded"></p>
+<p>(6): The middle key is inserted to a <em>new</em> root node.</p></div></div></div></div><a href="05.btree-index.html#uid_46" class="carousel-control left">&lsaquo;</a><a href="05.btree-index.html#uid_46" class="carousel-control right">&rsaquo;</a></div>
+            </div></div><div></div></section><div></div></section><div></div></section>
+
+<section md="yes" sysuid="uid_6" section_number="4."><h1>4. Other things about B+ Tree</h1><div><ul>
+<li>
+<p>B+ tree also offers efficient deletion.  The deletion algorithm is a mirror
+reversal of the insertion algorithm.  During deletion, the algorithm trys to
+<em>merge</em> nodes to avoid underflow.  If a merge took place, deletion recursively
+deletes the <code>(Key, PagePointer)</code> pair from the parent node.</p>
+</li>
+<li>
+<p>If the data entries are stored in a sequential file, sorted by a key, then one
+can very efficiently bulk load the sequential file into a B+ tree.</p>
+</li>
+<li>
+<p>B+ tree can be used as a sorting algorithm for disk based sorting.</p>
+</li>
+</ul></div></section>
+</article>
+    </div>
+
+        <script src="static/3rdparty/jquery-1.8.2.min.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/jquery.jplayer.min.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.player.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/popcorn/popcorn.jplayer.js"></script>
+    <script src="static/3rdparty/prettify/prettify.js"></script>    
+    <script src="static/3rdparty/bootstrap-2.2.2/js/bootstrap.js"></script>
+    <script src="static/3rdparty/sprintf-0.7-beta1.js"></script>
+
+    
+    <script> var piqunity = {staticurl: 'static'}; </script>
+    <script src="static/utils.js"></script>
+    <script src="static/j.actions.js"></script>
+    <script src="static/j.baseevents.js"></script>
+    <script src="static/j.carousel.js"></script>
+    <script src="static/j.media.js"></script>
+    <script src="static/j.nav.js"></script>
+    <script src="static/j.navbar.js"></script>
+    <script src="static/j.program.js"></script>
+    <script src="static/j.quiz.js"></script>
+    <script src="static/j.reading.js"></script>
+    <script src="static/j.ref.js"></script>
+    <script src="static/j.scrollspy.js"></script>
+    <script src="static/j.margin.js"></script>
+
+    <script src="static/piqunity.js"></script>
+    <script>$(function() {
+});
+</script>
+
+    
+
+
+</body>
+</html>

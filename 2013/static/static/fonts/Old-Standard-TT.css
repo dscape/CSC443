@@ -1,0 +1,6 @@
+@font-face {
+  font-family: 'Old Standard TT';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Old Standard TT Regular'), local('OldStandardTT-Regular'), url('Old-Standard-TT.woff.html') format('woff');
+}

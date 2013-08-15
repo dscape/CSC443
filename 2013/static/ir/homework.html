@@ -1,0 +1,221 @@
+<!doctype html>
+
+<html>
+<head>
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <link rel='icon' href="../static/images/db.png">
+    <link rel='stylesheet' href="../static/3rdparty/bootstrap-2.2.2/css/bootstrap.css">
+    <link rel='stylesheet' href="../static/3rdparty/bootstrap-2.2.2/css/bootstrap-responsive.css">
+    <link rel='stylesheet' href='../static/3rdparty/jQuery.jPlayer.2.2.0/skin/blue.monday/jplayer.blue.monday.css'>
+    <link rel='stylesheet' href='../static/3rdparty/ligature_symbols/style.css'>
+    <link rel='stylesheet' href='../static/3rdparty/prettify/prettify.css'>
+    <link href='../static/fonts/PT-serif.css' rel='stylesheet' type='text/css'>
+    <link href='../static/fonts/Inconsolata.css' rel='stylesheet' type='text/css'>
+    <link href='../static/fonts/Old-Standard-TT.css' rel='stylesheet' type='text/css'>
+
+    <link href='../static/piqunity.css' rel='stylesheet' type='text/css'>
+    <link href='../static/piqunity-reading.css' rel='stylesheet' type='text/css'>
+    <link href='../static/piqunity-lecture.css' rel='stylesheet' type='text/css'>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        messageStyle: 'simple',
+        showMathMenu: false,
+        skipStartupTypeset: false, /* TODO: */
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          skipTags: ["script","noscript","style","textarea"],
+          processEscapes: true
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }},
+        "HTML-CSS": { availableFonts: ["TeX"] }
+      });
+    </script>
+    <script type="text/javascript" src="../static/3rdparty/mathjax-2.0/MathJax.js"></script>
+
+    <style>
+    /* default */
+    /* desktop */
+    @media (min-width: 1200px) {
+    }
+    /* tablet */
+    @media (min-width: 768px) and (max-width: 1199px) {
+    }
+    /* phone */
+    @media (max-width: 767px) {
+}
+</style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <title>Text index and search</title>
+    <link rel='stylesheet' href='../style.css'>
+</head>
+
+<body
+    style='padding-top: 40px;' ## for navbar
+    >
+        
+    <div class='navbar-fixed-top navbar piqunity'>
+        <div class='navbar-inner'>
+            <div class='container'>
+                <a class='brand lsf-icon' title='book' 
+                   href='http://dblab.cs.toronto.edu/courses/443/2013' id='home-link'>
+                    Home
+                </a>
+                <ul class='nav' id='main-navbar'>
+                    <li class='dropdown'>
+                        <a href='homework.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            TOC <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li><a href="homework.html#" click="scrollto [sysuid=uid_2]">1. Introduction</a><ul></ul><li><a href="homework.html#" click="scrollto [sysuid=uid_3]">2. Getting prepared</a><ul></ul><li><a href="homework.html#" click="scrollto [sysuid=uid_4]">3. Building an indexer</a><ul></ul><li><a href="homework.html#" click="scrollto [sysuid=uid_5]">4. Building a searcher</a><ul></ul><li><a href="homework.html#" click="scrollto [sysuid=uid_6]">5. Experiments</a><ul></ul>
+                        </ul>
+                    </li>
+
+
+                    <li>
+                        <a id='navbar-scrollspy'></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class='content'>
+        <article sysuid="uid_0" data-meta='{"title": "Text index and search", "author": "CSC443"}'><section class="coverpage"><h1><span></span>Text index and search</h1><h2>CSC443</h2><p></p></section>
+
+<section md="yes" sysuid="uid_2" section_number="1."><h1>1. Introduction</h1><div><p>In this assignment, you will be experimenting with keyword search queries.
+We will utilize a library, <em>Xapian</em>, to index a portion of the <em>Internet
+Movie Database</em> (IMDB), namely biographies of actors and actresses known to
+IMDB.</p>
+<p>You will be implementing a (command line) interface to search persons' names
+by keywords in their biography.</p></div></section>
+
+<section md="yes" sysuid="uid_3" section_number="2."><h1>2. Getting prepared</h1><div><p>You need to download the appropriate content before getting started with
+this assignment:</p></div><div class="important" sysuid="uid_7"><div><ol>
+<li>You need to install and configure the Xapian library.
+Refer to the <a href="../tutorials/xapian.html">tutorial</a>.</li>
+<li>You need to download the biography data set from IMDB.
+The data set can  be found
+<a href="ftp://ftp.fu-berlin.de/pub/misc/movies/database/biographies.list.gz">here</a>.
+This data set contains about 80,000 entries.</li>
+<li>While the data set (after uncompression) is just a plain text file, it's
+much easier if we transform its format for convenient access in a C program.
+A simple <a href="parse_bio.py">Python script</a> is provided to perform the parsing
+of the biography data set.</li>
+</ol></div></div><div></div><hr sysuid="uid_8"><div><p>The biography parser can be invoked as:</p></div><pre class="dark program prettyprint linenums:1" sysuid="uid_9">
+python parse_bio.py biographies.list &gt; biographies.parsed.list
+</pre><div><p>The generated format is that all even lines are names, and odd lines are the
+biography of the name before that line.</p></div><pre dedent="yes" sysuid="uid_10"><i sysuid="uid_15">name 1</i>
+<i sysuid="uid_16">biography for name 1...</i>
+<i sysuid="uid_17">name 2</i>
+<i sysuid="uid_18">biography for name 2...</i>
+<i sysuid="uid_19">name 3</i>
+<i sysuid="uid_20">biography for name 3...</i>
+...</pre><div></div></section>
+
+<section md="yes" sysuid="uid_4" section_number="3."><h1>3. Building an indexer</h1><div><p>You are to build an indexer that indexes the biography data of each person.
+The documents it builds should have the words in biographies as <em>terms</em>, and
+the original biography <em>and</em> the person name as <em>data</em>.</p>
+<p>The indexer should be an executable.</p></div><pre class="dark program prettyprint" lineno="" sysuid="uid_11">
+bio_indexer &lt;parsed_biographies&gt; &lt;index_name&gt;
+</pre><div><p>It should report the time it takes to index the entries.</p>
+<p><strong>Note</strong></p></div><div class="important" sysuid="uid_12"><div><p>Some effort should be spent on cleaning the <em>words</em> in the biographies.
+Punctuations, white spaces, and other nonstandard characters should be
+properly dealt with.</p></div></div><div></div></section>
+
+<section md="yes" sysuid="uid_5" section_number="4."><h1>4. Building a searcher</h1><div><p>You are to build a searcher that searches the biography data using keywords.
+The searcher should be an executable.</p></div><pre class="dark program prettyprint" lineno="" sysuid="uid_13">
+bio_search &lt;index_name&gt; &lt;top-k&gt; &lt;keyword1&gt; &lt;keyword2&gt; ...
+</pre><div><p>If the keyword starts with '+', then its an <em>AND</em> query term, otherwise it's
+an <em>OR</em> query term.
+It should display:</p>
+<ol>
+<li>the amount of time it took to complete the search</li>
+<li>the top-k names and their biography.</li>
+<li>for each matched biography, the relevant keyword should be <em>highlighted</em>.
+Highlighting can be done by adding HTML tags around the keywords, and
+display the search result in a browser, or simply surround the matched
+keywords using =, e.g.  <span sysuid="uid_14">===Toronto===</span>.</li>
+</ol></div></section>
+
+<section md="yes" sysuid="uid_6" section_number="5."><h1>5. Experiments</h1><div><p>Generate plots for:</p>
+<ul>
+<li>
+<p>Indexing time versus data size</p>
+<ul>
+<li>
+<p>Vary the number of entries in the biographies.parsed.list file, and
+  measure the respective indexing time.</p>
+</li>
+<li>
+<p>Plot the indexing time (y-axis) versus the number of documents indexed
+  (x-axis).</p>
+</li>
+</ul>
+</li>
+<li>
+<p>Search time versus data size:</p>
+<ul>
+<li>Plot the search time (y-axis) versus the number of documents in the
+  index (x-axis).</li>
+</ul>
+</li>
+<li>
+<p>Search time versus number of <em>AND</em>-keywords in the query</p>
+<ul>
+<li>Plot the search time (y-axis) versus the number of AND-terms in the
+  query.</li>
+</ul>
+</li>
+<li>
+<p>Search time versus number of <em>OR</em>-keywords in the query</p>
+<ul>
+<li>Plot the search time (y-axis) versus the number of OR-terms in the
+  query.</li>
+</ul>
+</li>
+</ul>
+<p><em>Post and share</em> all the plots on Google Plus.
+For the plots, you should fix the top-k with <mathjax>$k \gt 10$</mathjax></p></div></section>
+</article>
+    </div>
+
+        <script src="../static/3rdparty/jquery-1.8.2.min.js"></script>
+    <script src="../static/3rdparty/jQuery.jPlayer.2.2.0/jquery.jplayer.min.js"></script>
+    <script src="../static/3rdparty/popcorn-1.2/popcorn.js"></script>
+    <script src="../static/3rdparty/popcorn-1.2/popcorn.player.js"></script>
+    <script src="../static/3rdparty/jQuery.jPlayer.2.2.0/popcorn/popcorn.jplayer.js"></script>
+    <script src="../static/3rdparty/prettify/prettify.js"></script>    
+    <script src="../static/3rdparty/bootstrap-2.2.2/js/bootstrap.js"></script>
+    <script src="../static/3rdparty/sprintf-0.7-beta1.js"></script>
+
+    
+    <script> var piqunity = {staticurl: '../static'}; </script>
+    <script src="../static/utils.js"></script>
+    <script src="../static/j.actions.js"></script>
+    <script src="../static/j.baseevents.js"></script>
+    <script src="../static/j.carousel.js"></script>
+    <script src="../static/j.media.js"></script>
+    <script src="../static/j.nav.js"></script>
+    <script src="../static/j.navbar.js"></script>
+    <script src="../static/j.program.js"></script>
+    <script src="../static/j.quiz.js"></script>
+    <script src="../static/j.reading.js"></script>
+    <script src="../static/j.ref.js"></script>
+    <script src="../static/j.scrollspy.js"></script>
+    <script src="../static/j.margin.js"></script>
+
+    <script src="../static/piqunity.js"></script>
+    <script>$(function() {
+});
+</script>
+
+    
+
+
+</body>
+</html>

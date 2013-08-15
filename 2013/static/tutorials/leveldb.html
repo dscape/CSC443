@@ -1,0 +1,281 @@
+<!doctype html>
+
+<html>
+<head>
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <link rel='icon' href="../static/images/db.png">
+    <link rel='stylesheet' href="../static/3rdparty/bootstrap-2.2.2/css/bootstrap.css">
+    <link rel='stylesheet' href="../static/3rdparty/bootstrap-2.2.2/css/bootstrap-responsive.css">
+    <link rel='stylesheet' href='../static/3rdparty/jQuery.jPlayer.2.2.0/skin/blue.monday/jplayer.blue.monday.css'>
+    <link rel='stylesheet' href='../static/3rdparty/ligature_symbols/style.css'>
+    <link rel='stylesheet' href='../static/3rdparty/prettify/prettify.css'>
+    <link href='../static/fonts/PT-serif.css' rel='stylesheet' type='text/css'>
+    <link href='../static/fonts/Inconsolata.css' rel='stylesheet' type='text/css'>
+    <link href='../static/fonts/Old-Standard-TT.css' rel='stylesheet' type='text/css'>
+
+    <link href='../static/piqunity.css' rel='stylesheet' type='text/css'>
+    <link href='../static/piqunity-reading.css' rel='stylesheet' type='text/css'>
+    <link href='../static/piqunity-lecture.css' rel='stylesheet' type='text/css'>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        messageStyle: 'simple',
+        showMathMenu: false,
+        skipStartupTypeset: false, /* TODO: */
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          skipTags: ["script","noscript","style","textarea"],
+          processEscapes: true
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }},
+        "HTML-CSS": { availableFonts: ["TeX"] }
+      });
+    </script>
+    <script type="text/javascript" src="../static/3rdparty/mathjax-2.0/MathJax.js"></script>
+
+    <style>
+    /* default */
+    /* desktop */
+    @media (min-width: 1200px) {
+    }
+    /* tablet */
+    @media (min-width: 768px) and (max-width: 1199px) {
+    }
+    /* phone */
+    @media (max-width: 767px) {
+}
+</style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <title>A quick guide to LevelDB</title>
+    <link rel='stylesheet' href='../style.css'>
+</head>
+
+<body
+    style='padding-top: 40px;' ## for navbar
+    >
+        
+    <div class='navbar-fixed-top navbar piqunity'>
+        <div class='navbar-inner'>
+            <div class='container'>
+                <a class='brand lsf-icon' title='book' 
+                   href='http://dblab.cs.toronto.edu/courses/443/2013' id='home-link'>
+                    Home
+                </a>
+                <ul class='nav' id='main-navbar'>
+                    <li class='dropdown'>
+                        <a href='leveldb.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            TOC <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li><a href="leveldb.html#" click="scrollto [sysuid=uid_2]">1. Why use LevelDB</a><ul></ul><li><a href="leveldb.html#" click="scrollto [sysuid=uid_3]">2. First few steps of creates LevelDB database</a><ul><li><a href="leveldb.html#" click="scrollto [sysuid=uid_9]">2.1. Compiling with LevelDB</a><ul></ul><li><a href="leveldb.html#" click="scrollto [sysuid=uid_10]">2.2. Creating LevelDB database</a><ul></ul></ul><li><a href="leveldb.html#" click="scrollto [sysuid=uid_4]">3. Writing and retrieving key/value pairs</a><ul><li><a href="leveldb.html#" click="scrollto [sysuid=uid_11]">3.1. Key value pairs</a><ul></ul><li><a href="leveldb.html#" click="scrollto [sysuid=uid_12]">3.2. Dealing with unique keys</a><ul></ul></ul><li><a href="leveldb.html#" click="scrollto [sysuid=uid_5]">4. Iterating over a range</a><ul></ul>
+                        </ul>
+                    </li>
+
+
+                    <li>
+                        <a id='navbar-scrollspy'></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class='content'>
+        <article sysuid="uid_0" data-meta='{"title": "A quick guide to LevelDB", "author": "CSC 443"}'><section class="coverpage"><h1><span></span>A quick guide to LevelDB</h1><h2>CSC 443</h2><p></p></section>
+
+<section md="yes" sysuid="uid_2" section_number="1."><h1>1. Why use LevelDB</h1><div><p>LevelDB is a high quality B+-tree implementation.  We want to use it as a
+B+tree index to a data file to speed up query processing.</p>
+<p>The main functionalities of LevelDB we want are:</p>
+<ol>
+<li><i addclass="alert alert-success" sysuid="uid_6" add-class="alert alert-success" class="instruction"></i>Storing records as key/value pairs where the key is
+the <em>key</em> attributes of the records.</li>
+<li><i addclass="alert alert-success" sysuid="uid_7" add-class="alert alert-success" class="instruction"></i>Fast search of record(s) by the key.</li>
+<li><i addclass="alert alert-success" sysuid="uid_8" add-class="alert alert-success" class="instruction"></i>Traveral of records in the order of increasing key
+value.</li>
+</ol>
+<p>For the less patient readers, please refer to this
+<a href="http://leveldb.googlecode.com/svn/trunk/doc/index.html"><em>well written</em> user's guide</a>
+on LevelDB API from the authors of LevelDB.  </p></div></section>
+
+<section md="yes" sysuid="uid_3" section_number="2."><h1>2. First few steps of creates LevelDB database</h1><div><p>LevelDB uses a directory to store its data.  You should
+have already experimented with the basics of running
+LevelDB applications in
+<a href="../introduction/homework.html">"Setup"</a> practical
+learning unit of this course.</p></div><section md="yes" sysuid="uid_9" section_number="2.1."><h1>2.1. Compiling with LevelDB</h1><div></div><center><div md="yes" class="important" sysuid="uid_16" style="max-width: 600px;width: 100%"><div><p>We assume that you are using g++ compiler.</p></div></div></center><div><ol>
+<li>
+<p>Download leveldb-x.x.x.tar.gz from Google Code
+<a href="https://code.google.com/p/leveldb/downloads/list">repository</a>, and
+uncompress it to some directory.</p>
+</li>
+<li>
+<p>Run make in <code>.../leveldb-x.x.x/</code>.  This compiles the static leveldb
+library, named <code>libleveldb.a</code></p>
+</li>
+<li>
+<p>You need to include the <code>libleveldb.a</code> <em>and</em> the <code>pthread</code> library
+when compiling C/C++ source code that uses leveldb API.</p>
+</li>
+</ol>
+<p>The following command compiles the <code>my_program.cc</code>:</p></div><pre class="dark program prettyprint" lineno="" sysuid="uid_17">
+export LEVELDB=~/leveldb-1.9.0
+g++ -o my_program my_program.cc $LEVELDB/libleveldb.a -lpthread -I $LEVELDB/include
+</pre><div><p>where we assume that <code>~/level-1.9.0/</code> is the path where leveldb was stored.</p></div></section><div></div><section sysuid="uid_10" section_number="2.2."><h1>2.2. Creating LevelDB database</h1>
+
+        <pre class="dark program prettyprint linenums:1" sysuid="uid_18">
+#include "leveldb/db.h"
+
+...
+/**
+ * opens a database connection to "./leveldb_dir"
+ */
+leveldb::DB *db;
+leveldb::Options options;
+options.create_if_missing = true;
+leveldb::Status status = leveldb::DB::Open(options, "./leveldb_dir", &amp;db);
+</pre>
+        
+    </section><div></div></section>
+
+<section sysuid="uid_4" section_number="3."><h1>3. Writing and retrieving key/value pairs</h1>
+
+    <section md="yes" sysuid="uid_11" section_number="3.1."><h1>3.1. Key value pairs</h1><div><p>LevelDB is a B+tree implementation, so it stores key/value pairs.  It
+assumes that all keys are unique.</p>
+<p>In the C++ namespace <code>leveldb</code>, we find that <code>DB</code> class
+has three important methods:</p>
+<ul>
+<li><code>DB::Put(WriteOptions& options, 
+                    const Slice& key, const Slice& value)</code></li>
+<li><code>DB::Get(ReadOptions& options, 
+                    const Slice& key, std::string *value)</code></li>
+<li><code>DB::Delete(WriteOptions& options, 
+                    const Slice& key)</code></li>
+</ul>
+<p>We will be using <code>Put</code> and <code>Get</code> to write key/value
+pairs to the B+ tree index, and get them back.</p>
+<p>The default <code>ReadOptions</code> and <code>WriteOptions</code> can be constructed by:</p></div><pre class="dark program prettyprint linenums:1" sysuid="uid_19">
+leveldb::WriteOptions()
+leveldb::ReadOptions()
+</pre><div><p><code>Put(...)</code> models both the key and value as
+<code>leveldb::Slice</code>.  Internally, it's just a 
+<a href="http://code.google.com/p/leveldb/source/browse/include/leveldb/slice.h#25">byte array</a>,
+but equipped with many very useful
+conversion mehods.</p>
+<p>We can construct a slice (key or value) from a string
+literal:</p></div><pre class="dark program prettyprint" lineno="" sysuid="uid_20">
+leveldb::Slice key = "CSC443/WINTER";
+</pre><div><p>We can also construct a slice from a C++ string:</p></div><pre class="dark program prettyprint" lineno="" sysuid="uid_21">
+leveldb::Slice value = std::string("This is a course about database implementation.")
+</pre><div><p>We can even construct a slice from a pointer.</p></div><pre class="dark program prettyprint" lineno="" sysuid="uid_22">
+char *ptr = (char *)malloc(100);
+leveldb::Slice key(ptr, 100);
+</pre><div></div><div sysuid="uid_30" class="accordion" id="uid_30"><div class="accordion-group" sysuid="uid_31"><div class="accordion-heading"><a class="accordion-toggle" sysuid="uid_32" href="leveldb.html#uid_33" data-toggle="collapse" data-parent="#uid_30">Note: memory management of Slice</a></div><div close="yes" sysuid="uid_33" class="accordion-body collapse" id="uid_33"><div class="accordion-inner" sysuid="uid_34"><div close="yes" sysuid="uid_23">
+        <div class="important" sysuid="uid_28"><div><p>It's important to note that <code>Slice()</code> does not copy
+any memory.  The constructor only keeps a reference
+to the original data.  So, it's important that the
+original source does not get deallocated.</p></div></div>
+    </div></div></div></div></div><div><p><strong>Get assumes std::string</strong></p></div><div class="important" sysuid="uid_24"><div><p>It's important to note that when reading key/value pairs
+from the B+ tree, leveldb returns the value as a C++
+string.</p></div></div><div></div></section>
+
+    <section md="yes" sysuid="uid_12" section_number="3.2."><h1>3.2. Dealing with unique keys</h1><div><p>LevelDB assumes that all keys must be unique.
+Sometimes, we may wish to index records on 
+attributes which are not keys of the table.  A common
+trick <a href="https://groups.google.com/forum/?fromgroups=#!topic/leveldb/cIOdwXd53Tg">suggested by the author of
+LevelDB</a>
+is to append a running counter to the key.</p></div><pre annotated="yes" id="p1" class="dark program prettyprint linenums:1" sysuid="uid_25" data-blocks='{"put": {"start": 10}, "copy": {"start": 8, "end": 9}, "uniqkey": {"start": 3}}'>long unique_counter = 0;
+
+char key[10];
+char unique_key[10 + sizeof(long)];  
+while(...) {
+    ...
+    unique_counter ++;
+    get_key(record, &amp;key);
+    memcpy(unique_key, key, 10); 
+    memcpy(unique_key + 10, &amp;unique_counter, sizeof(long)); 
+    db-&gt;Put(Slice(unique_key, sizeof(unique_key)), value); 
+}
+</pre><div></div><div color="#444" md="yes" align-middle="#p1 .uniqkey" group="p1" sysuid="uid_26" class="margin margin-right"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_26]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div><div><p>We define a <em>composite</em> key consisting of the
+key and a <code>long</code> counter.</p></div></div></div></div></div><div></div><div color="#555" md="yes" align-middle="#p1 .copy" group="p1" close="yes" sysuid="uid_27" class="margin margin-right closed"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_27]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div><div><p>We copy the key followed by the counter value to the
+composite key.</p></div></div></div></div></div><div></div></section>
+</section>
+
+<section md="yes" sysuid="uid_5" section_number="4."><h1>4. Iterating over a range</h1><div><p>LevelDB supports efficient iteration in ascending order of keys.</p>
+<p><code>leveldb::Iterator</code> is a class that supports very useful navigation in the
+B+ tree.</p>
+<p>The following code constructs (and frees) a new iterator:</p></div><pre class="dark program prettyprint linenums:1" sysuid="uid_13">
+leveldb::Iterator* it = db-&gt;NewIterator(leveldb::ReadOptions());
+...
+delete it;
+</pre><div><p>The following code prints out <em>all</em> the key/value pairs in the B+ tree:</p></div><pre class="dark program prettyprint linenums:1" sysuid="uid_14">
+leveldb::Iterator* it = db-&gt;NewIterator(leveldb::ReadOptions());
+for (it-&gt;SeekToFirst(); it-&gt;Valid(); it-&gt;Next()) {
+    leveldb::Slice key = it-&gt;key();
+    leveldb::Slice value = it-&gt;value();
+    std::string key_str = key.ToString();
+    std::string val_str = value.ToString();
+    cout &lt;&lt; key_str &lt;&lt; ": "  &lt;&lt; val_str &lt;&lt; endl;
+}
+assert(it-&gt;status().ok());  // Check for any errors found during the scan
+delete it;
+</pre><div><p>To iterate over a finite range we can do this:</p></div><pre class="dark program prettyprint linenums:1" sysuid="uid_15">
+leveldb::Slice start = ...;
+leveldb::Slice end = ...;
+leveldb::Options options;
+
+leveldb::Iterator* it = db-&gt;NewIterator(leveldb::ReadOptions());
+for (it-&gt;Seek(start); it-&gt;Valid(); it-&gt;Next()) {
+    leveldb::Slice key = it-&gt;key();
+    leveldb::Slice value = it-&gt;value();
+    if(options.comparator-&gt;compare(key, end) &gt; 0) {
+        // key &gt; end
+        break;
+    } else {
+        /**
+         * process (key, value)
+         */
+    }
+}
+delete it;
+</pre><div></div></section>
+</article>
+    </div>
+
+        <script src="../static/3rdparty/jquery-1.8.2.min.js"></script>
+    <script src="../static/3rdparty/jQuery.jPlayer.2.2.0/jquery.jplayer.min.js"></script>
+    <script src="../static/3rdparty/popcorn-1.2/popcorn.js"></script>
+    <script src="../static/3rdparty/popcorn-1.2/popcorn.player.js"></script>
+    <script src="../static/3rdparty/jQuery.jPlayer.2.2.0/popcorn/popcorn.jplayer.js"></script>
+    <script src="../static/3rdparty/prettify/prettify.js"></script>    
+    <script src="../static/3rdparty/bootstrap-2.2.2/js/bootstrap.js"></script>
+    <script src="../static/3rdparty/sprintf-0.7-beta1.js"></script>
+
+    
+    <script> var piqunity = {staticurl: '../static'}; </script>
+    <script src="../static/utils.js"></script>
+    <script src="../static/j.actions.js"></script>
+    <script src="../static/j.baseevents.js"></script>
+    <script src="../static/j.carousel.js"></script>
+    <script src="../static/j.media.js"></script>
+    <script src="../static/j.nav.js"></script>
+    <script src="../static/j.navbar.js"></script>
+    <script src="../static/j.program.js"></script>
+    <script src="../static/j.quiz.js"></script>
+    <script src="../static/j.reading.js"></script>
+    <script src="../static/j.ref.js"></script>
+    <script src="../static/j.scrollspy.js"></script>
+    <script src="../static/j.margin.js"></script>
+
+    <script src="../static/piqunity.js"></script>
+    <script>$(function() {
+});
+</script>
+
+    
+
+
+</body>
+</html>

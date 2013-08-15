@@ -1,0 +1,314 @@
+<!doctype html>
+
+<html>
+<head>
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <link rel='icon' href="static/images/db.png">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap.css">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap-responsive.css">
+    <link rel='stylesheet' href='static/3rdparty/jQuery.jPlayer.2.2.0/skin/blue.monday/jplayer.blue.monday.css'>
+    <link rel='stylesheet' href='static/3rdparty/ligature_symbols/style.css'>
+    <link rel='stylesheet' href='static/3rdparty/prettify/prettify.css'>
+    <link href='static/fonts/PT-serif.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Inconsolata.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Old-Standard-TT.css' rel='stylesheet' type='text/css'>
+
+    <link href='static/piqunity.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-reading.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-lecture.css' rel='stylesheet' type='text/css'>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        messageStyle: 'simple',
+        showMathMenu: false,
+        skipStartupTypeset: false, /* TODO: */
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          skipTags: ["script","noscript","style","textarea"],
+          processEscapes: true
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }},
+        "HTML-CSS": { availableFonts: ["TeX"] }
+      });
+    </script>
+    <script type="text/javascript" src="static/3rdparty/mathjax-2.0/MathJax.js"></script>
+
+    <style>
+    /* default */
+    /* desktop */
+    @media (min-width: 1200px) {
+    }
+    /* tablet */
+    @media (min-width: 768px) and (max-width: 1199px) {
+    }
+    /* phone */
+    @media (max-width: 767px) {
+}
+</style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <title>External Merge Sort</title>
+    <link rel='stylesheet' href='style.css'>
+</head>
+
+<body
+    style='padding-top: 40px;' ## for navbar
+    >
+        
+    <div class='navbar-fixed-top navbar piqunity'>
+        <div class='navbar-inner'>
+            <div class='container'>
+                <a class='brand lsf-icon' title='book' 
+                   href='http://dblab.cs.toronto.edu/courses/443/2013' id='home-link'>
+                    Home
+                </a>
+                <ul class='nav' id='main-navbar'>
+                    <li class='dropdown'>
+                        <a href='07.sorting.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            TOC <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li><a href="07.sorting.html#" click="scrollto [sysuid=uid_2]">1. Formal definition of merge sort</a><ul><li><a href="07.sorting.html#" click="scrollto [sysuid=uid_6]">1.1. Streaming a segment</a><ul></ul><li><a href="07.sorting.html#" click="scrollto [sysuid=uid_7]">1.2. Multiway merge</a><ul></ul><li><a href="07.sorting.html#" click="scrollto [sysuid=uid_8]">1.3. Multi-round merging</a><ul></ul></ul><li><a href="07.sorting.html#" click="scrollto [sysuid=uid_3]">2. Disk based multi-way merge sort</a><ul><li><a href="07.sorting.html#" click="scrollto [sysuid=uid_12]">2.1. The external merge sort algorithm</a><ul></ul><li><a href="07.sorting.html#" click="scrollto [sysuid=uid_13]">2.2. Two pass external sort</a><ul></ul><li><a href="07.sorting.html#" click="scrollto [sysuid=uid_14]">2.3. Practical consideration</a><ul></ul></ul>
+                        </ul>
+                    </li>
+
+
+                    <li>
+                        <a id='navbar-scrollspy'></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class='content'>
+        <article sysuid="uid_0" data-meta='{"title": "External Merge Sort", "description": "In this article, we describe the external sorting algorithm.  The external sorting algorithm sorts data in the secondary storage which are too large to fit into the main memory.", "author": "CSC443"}'><section class="coverpage"><h1><span></span>External Merge Sort</h1><h2>CSC443</h2><p>In this article, we describe the external sorting algorithm.  The external sorting algorithm sorts data in the secondary storage which are too large to fit into the main memory.</p></section>
+
+<section md="yes" sysuid="uid_2" section_number="1."><h1>1. Formal definition of merge sort</h1><div><p>External merge sort is based on the main memory merge sort.  In this
+section, we will present the main memory merge sort in a way that is best
+for generalizing to the external merge sort.</p>
+<p>Let <mathjax>$D$</mathjax> be the list of data items to be sorted.  We assume that each item
+is of type <mathjax>$V$</mathjax>.  Let <mathjax>$\|V\|$</mathjax> be the memory size of the type <mathjax>$V$</mathjax>.</p>
+<p>We say that <mathjax>$D$</mathjax> is <mathjax>$n$</mathjax>-sorted if each <mathjax>$D[i\cdot n \dots (i+1)\cdot n]$</mathjax> 
+<a name="footnote1" sysuid="uid_5" class="ref lsf">pin</a>
+segment of <mathjax>$D$</mathjax> are sorted.</p>
+<p>The trivial case is that any <mathjax>$D$</mathjax> is always 1-sorted.</p>
+<p>Merge sort relies on the observation that if <mathjax>$D$</mathjax> is <mathjax>$n$</mathjax>-sorted, then with
+only <mathjax>$k\cdot \|V\|$</mathjax> memory, we can produce a copy of <mathjax>$D$</mathjax> that is
+<mathjax>$kn$</mathjax>-sorted.</p></div><section md="yes" sysuid="uid_6" section_number="1.1."><h1>1.1. Streaming a segment</h1><div><p>Consider that we simply need to scan through a segment <mathjax>$D[in\cdots
+(i+1)n]$</mathjax> in a streaming fashion.</p></div><pre sysuid="uid_19" class="program prettyprint linenums:1">
+class Stream {
+    /**
+     * construct a stream of elements in $D$
+     * starting with $i$ to $j$
+     */
+    Stream($D$, int i, int j);
+
+    /**
+     * gets the next element in the stream.
+     * If the stream has reached its end ($D$[j] or end of $D$)
+     * then we return $\infty$.
+     */
+    V next();
+}
+</pre><div><p>An <code>Stream</code> object only needs <mathjax>$\mathcal{O}(1)$</mathjax> memory requirement, as it
+only needs to maintain:</p>
+<ol>
+<li>a pointer to the current position in <mathjax>$D$</mathjax>,</li>
+<li>the return value of <code>Stream::next()</code>.</li>
+</ol></div></section><div></div><section md="yes" sysuid="uid_7" section_number="1.2."><h1>1.2. Multiway merge</h1><div><p>The <em>merge</em> operation scans through <mathjax>$D$</mathjax> and merges <mathjax>$k$</mathjax> consecutive segments
+into larger sorted segments.</p>
+<p>If <mathjax>$D$</mathjax> is already <mathjax>$n$</mathjax>-sorted, the merge operation produces a <em>copy</em> of
+<mathjax>$D$</mathjax> that is <mathjax>$kn$</mathjax>-sorted.</p></div><pre sysuid="uid_20" class="program prettyprint linenums:1">
+/**
+ * Input: $D$ must be $n$-sorted
+ * Output: $E$ will be $kn$-sorted
+ */
+void merge($D$, $E$, n) {
+    const int k = ...; // a constant
+    Stream incomings[k];
+    V      buf[k];
+
+    for(int offset=0; offset &lt; $D$.size(); offset += $n\cdot k$) {
+        // initialize streams and merge buffer
+        for(int i=0; i &lt; k; i++) {
+            incomings[i] = Stream($D$, offset+$i\cdot n$, offset+(i+1)$\cdot$n)
+            buf[i] = incoming[i].next()
+        }
+        // perform $k$-way merge
+        int min_val, min_idx
+        loop {
+            min_val, min_idx = get_minimum(buf);
+            $E$.append(min_val);
+            buf[min_idx] = incomings[min_idx].next();
+
+        } until($\forall$i$\le k$, buf[i] == $\infty$)
+    }
+}
+</pre><div></div></section><div></div><section md="yes" sysuid="uid_8" section_number="1.3."><h1>1.3. Multi-round merging</h1><div><p>To sort the entire list, we simply repeatedly apply <code>merge()</code> with ever
+increasing <mathjax>$n$</mathjax>.  In order to the memory, we can choose to reuse the
+original list <mathjax>$D$</mathjax> during the iteration.</p></div><pre id="mergesort" sysuid="uid_21" class="program prettyprint linenums:1">
+void merge_sort($D$) {
+    const int k = ...; // a constant
+    $E$ = allocate($D$.size()) // byte array $D$.size()$\times\|V\|$
+    int n = 1; // the length of sorted segments in $D$
+    while(n &lt; $D$.size()) {
+        merge($D$, $E$, n); // $E$ is $kn$-sorted
+        $D$, $E$ = $E$, $D$; // swap $D$, $E$ as pointers in $O$(1)
+        n = k $\cdot$ n; // now, $D$ is $kn$ sorted
+    }
+}
+</pre><div></div></section><div></div></section>
+
+<section md="yes" sysuid="uid_3" section_number="2."><h1>2. Disk based multi-way merge sort</h1><div><p>There are several properties about the main memory merge sort that are
+particularly attractive:</p>
+<ul>
+<li>
+<p>if we do not consider the storage of <mathjax>$D$</mathjax> and <mathjax>$E$</mathjax>, merge sort
+only uses <mathjax>$\mathcal{O}(k)$</mathjax> storage.  You shall see that <mathjax>$D$</mathjax> and <mathjax>$E$</mathjax> will be
+disk-based entities, so they will not consume main memory.</p>
+</li>
+<li>
+<p>each round increases the sorted segment length by <mathjax>$k$</mathjax>, so to sort <mathjax>$N$</mathjax>
+elements, we only need <mathjax>$\log_k(N)$</mathjax> rounds.  But each round requires a
+sequential scan of the data.</p>
+</li>
+</ul>
+<p>The general approach of disk based multi-way merge sort is to treat the data
+sets <mathjax>$D$</mathjax> and <mathjax>$E$</mathjax> as disk based files, and implement <code>Stream</code> objects to read
+the data file on disk.  There are three main differences for the sake of
+minimizing the number of disk I/O required.</p>
+<p><strong>Difference (I)</strong>: read data in pages</p></div><div class="important" sysuid="uid_9"><div><p>Since each stream reads data using page based disk
+I/O, each stream takes more memory than before as it
+needs to have a page buffer to hold the data from
+disk.</p></div></div><div><p><strong>Difference (II)</strong>: write data in pages</p></div><div class="important" sysuid="uid_10"><div><p>We cannot append to <mathjax>$E$</mathjax> one element at a time, but
+rather we need to buffer the writes to pages.  This
+means that there will be <em>one</em> write page required
+in main memory.</p></div></div><div><p>Let <mathjax>$P_\mathrm{read}$</mathjax> be the read page size, and <mathjax>$P_\mathrm{write}$</mathjax> the
+write page size, the <code>merge(...)</code> memory requirement will be:</p>
+<p><mathjax>$$ 
+\begin{aligned}
+             & k\cdot P_\mathrm{read} + P_\mathrm{write} + c \\\\
+     \approx &  k\cdot P_\mathrm{read} + P_\mathrm{write} 
+\end{aligned}
+$$</mathjax>
+where <mathjax>$c$</mathjax> is the number of bytes for holding the merge buffer <code>buf</code>, which
+is neglegible compared to the pages.</p>
+<p><strong>Difference (III)</strong>: sort data in memory first</p></div><div class="important" sysuid="uid_11"><div><p>In the main memory merge sort, we start with <mathjax>$D$</mathjax>
+only 1-sorted.  While this is still a valid approach
+to start sorting data on disk, it's far more
+advantageous to scan through <mathjax>$D$</mathjax>, loading large
+segments of <mathjax>$D$</mathjax> into main memory and deploy a main
+memory sorting algorithm, to make <mathjax>$D$</mathjax> <mathjax>$M$</mathjax>-sorted,
+where <mathjax>$M$</mathjax> is the capacity of the main memory.</p></div></div><div></div><section md="yes" sysuid="uid_12" section_number="2.1."><h1>2.1. The external merge sort algorithm</h1><div></div><pre id="extern" annotated="yes" sysuid="uid_22" data-blocks='{"firstpass": {"start": 8, "end": 12}, "same": {"start": 14, "end": 18}}' class="program prettyprint linenums:1">void extern_merge_sort($D$) {
+    /**
+     * Create large sorted segments in $D$
+     * MAX_MEMORY_SIZE is the maximum number of
+     * elements that the main memory can hold.
+     t
+     */
+    void *buf = allocate(MAX_MEMORY_SIZE);
+    for(int i=0; i &lt;= MAX_MEMORY_SIZE / $D$.size(); i++) { 
+        Disk::read(D, into=buf, offset=i*MAX_MEMORY_SIZE, size=MAX_MEMORY_SIZE)
+        main_memory_sort(buf);
+        Disk::write(D, from=buf, offset=i*MAX_MEMORY_SIZE, size=MAX_MEMORY_SIZE);
+    } 
+    free(buf);
+
+
+    // ... invoke merge($D$, $E$, MAX_MEMORY_SIZE) ...
+
+
+}
+</pre><div></div><div md="yes" align-middle="#extern .firstpass" sysuid="uid_23" class="margin margin-right"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_23]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div><div><p>This is the <em>first</em> pass of the external
+sorting.</p></div></div></div></div></div><div></div><div md="yes" align-middle="#extern .same" sysuid="uid_24" class="margin margin-right"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_24]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div><div><p>See <a click="scrollmiddle #mergesort" sysuid="uid_29"><code>merge_sort</code></a> for
+this part.</p></div></div></div></div></div><div></div></section><div></div><section md="yes" sysuid="uid_13" section_number="2.2."><h1>2.2. Two pass external sort</h1><div><p>The two-pass external sort restricts the number of
+passes we are allowed over the data set.  Since, the
+first pass is to sort <mathjax>$D$</mathjax> into large segments, it
+only invokes <code>merge(...)</code> <em>once</em>.  This restriction
+places a constraint on the maximal data set size
+that it can handle.</p>
+<p>Consider the following definitions.  The units are
+in elements of type <mathjax>$V$</mathjax>.</p></div><center><div sysuid="uid_25" style="max-width: 600px;width: 100%">
+            <table class="table table-striped" sysuid="uid_30"><tr sysuid="uid_31"><td sysuid="uid_35">Maximal memory size</td><td sysuid="uid_36">$M$</td></tr>
+<tr sysuid="uid_32"><td sysuid="uid_37">            Data set size</td><td sysuid="uid_38">$\|D\|$</td></tr>
+<tr sysuid="uid_33"><td sysuid="uid_39">            Page size used by streams</td><td sysuid="uid_40">$P_\mathrm{read}$</td></tr>
+<tr sysuid="uid_34"><td sysuid="uid_41">            Page size used to write to $E$</td><td sysuid="uid_42">$P_\mathrm{write}$</td></tr>
+</table>
+        </div></center><div><p>Let's derive the maximal data set size as a function
+of various parameters:</p>
+<p><strong>First round</strong></p></div><div class="important" sysuid="uid_26"><div><p><mathjax>$D$</mathjax> is <mathjax>$M$</mathjax>-sorted.</p></div></div><div><p><strong>Merge</strong></p></div><div class="important" sysuid="uid_27"><div><ol>
+<li>The <code>merge(...)</code> requires:
+<mathjax>$$
+\begin{aligned}
+    & k\cdot P_\mathrm{read} + P_\mathrm{write} \leq M \\\\
+\Rightarrow & k \leq \frac{M - P_\mathrm{write}}{P_\mathrm{read}}
+\end{aligned}
+$$</mathjax></li>
+<li>After <code>merge(...)</code> the data set is <mathjax>$k\cdot
+M$</mathjax>-sorted.  Thus, we must have 
+<mathjax>$$\|D\| \leq k\cdot M$$</mathjax>
+Together with the constraint on <mathjax>$k$</mathjax>, we have:
+\begin{equation}
+\|D\| \leq \left(
+    \frac{M-P_\mathrm{write}}
+         {P_\mathrm{read}} \right)\cdot M
+    \approx \frac{M^2} {P_\mathrm{read}}
+\end{equation}</li>
+</ol></div></div><div></div></section><div></div><section md="yes" sysuid="uid_14" section_number="2.3."><h1>2.3. Practical consideration</h1><div><p>Equation (1) demonstrates that we can actually
+improve the number of <em>rounds</em> of merging by
+minimizing the size of read pages.</p>
+<p>However, this may be practical impossible depending
+on the application.  For relational database
+engines, the data file is stored as a heap file
+whose format is specific to a <em>fixed</em> page size.  In
+that case, <mathjax>$P_\mathrm{read}$</mathjax> must be the page size
+of the heap file, and cannot be modified by the
+sorting algorithm.</p></div></section><div></div></section>
+
+<section sysuid="uid_43"></section><section reference="yes"><h1>References</h1><div name="footnote1" sysuid="uid_4" class="citation"><span class="index">1</span>
+    <i sysuid="uid_15">D[m ... n]</i> is the sublist starting (inclusively) at
+    index <i sysuid="uid_16">m</i> and ending (exclusively) at index
+    <i sysuid="uid_17">n</i>, i.e.: <i sysuid="uid_18">D[m], D[m+1], ..., D[n-1]</i>
+</div></section>
+</article>
+    </div>
+
+        <script src="static/3rdparty/jquery-1.8.2.min.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/jquery.jplayer.min.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.player.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/popcorn/popcorn.jplayer.js"></script>
+    <script src="static/3rdparty/prettify/prettify.js"></script>    
+    <script src="static/3rdparty/bootstrap-2.2.2/js/bootstrap.js"></script>
+    <script src="static/3rdparty/sprintf-0.7-beta1.js"></script>
+
+    
+    <script> var piqunity = {staticurl: 'static'}; </script>
+    <script src="static/utils.js"></script>
+    <script src="static/j.actions.js"></script>
+    <script src="static/j.baseevents.js"></script>
+    <script src="static/j.carousel.js"></script>
+    <script src="static/j.media.js"></script>
+    <script src="static/j.nav.js"></script>
+    <script src="static/j.navbar.js"></script>
+    <script src="static/j.program.js"></script>
+    <script src="static/j.quiz.js"></script>
+    <script src="static/j.reading.js"></script>
+    <script src="static/j.ref.js"></script>
+    <script src="static/j.scrollspy.js"></script>
+    <script src="static/j.margin.js"></script>
+
+    <script src="static/piqunity.js"></script>
+    <script>$(function() {
+});
+</script>
+
+    
+
+
+</body>
+</html>

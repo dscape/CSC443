@@ -1,0 +1,25 @@
+/* ---------- SECTION --------------- */
+
+.in-lecture section > h1 { margin-top: 0 } /* overriding bootstrap */
+.in-lecture article > section > h1 { font-size: 150%; }
+.in-lecture article > section > section > h1 { font-size: 120%; }
+.in-lecture article > section > section > section > h1 { font-size: 100%; }
+.in-lecture article > section > section > section > section > h1 { font-size: 100%; text-decoration: underline; }
+.in-lecture article section { clear: both; }
+.in-lecture article > section:not(.coverpage)
+{
+    margin-left: 100px;
+    border: 24px solid #fff;
+    text-align: justify;
+}
+
+/* ---------- MARGIN ---------------- */
+.in-lecture .margin .margin-content
+{
+    max-width: 350px;                   /* $marginWidth */
+}
+
+/* ---------- PAGES ----------------- */
+.in-lecture .page {
+    margin-bottom: 1024px;
+}

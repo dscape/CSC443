@@ -1,0 +1,274 @@
+<!doctype html>
+
+<html>
+<head>
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <link rel='icon' href="../static/images/db.png">
+    <link rel='stylesheet' href="../static/3rdparty/bootstrap-2.2.2/css/bootstrap.css">
+    <link rel='stylesheet' href="../static/3rdparty/bootstrap-2.2.2/css/bootstrap-responsive.css">
+    <link rel='stylesheet' href='../static/3rdparty/jQuery.jPlayer.2.2.0/skin/blue.monday/jplayer.blue.monday.css'>
+    <link rel='stylesheet' href='../static/3rdparty/ligature_symbols/style.css'>
+    <link rel='stylesheet' href='../static/3rdparty/prettify/prettify.css'>
+    <link href='../static/fonts/PT-serif.css' rel='stylesheet' type='text/css'>
+    <link href='../static/fonts/Inconsolata.css' rel='stylesheet' type='text/css'>
+    <link href='../static/fonts/Old-Standard-TT.css' rel='stylesheet' type='text/css'>
+
+    <link href='../static/piqunity.css' rel='stylesheet' type='text/css'>
+    <link href='../static/piqunity-reading.css' rel='stylesheet' type='text/css'>
+    <link href='../static/piqunity-lecture.css' rel='stylesheet' type='text/css'>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        messageStyle: 'simple',
+        showMathMenu: false,
+        skipStartupTypeset: false, /* TODO: */
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          skipTags: ["script","noscript","style","textarea"],
+          processEscapes: true
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }},
+        "HTML-CSS": { availableFonts: ["TeX"] }
+      });
+    </script>
+    <script type="text/javascript" src="../static/3rdparty/mathjax-2.0/MathJax.js"></script>
+
+    <style>
+    /* default */
+    
+    .uid_5 center {
+        font-size: 120%;
+        line-height: 60px;
+    }
+    
+    /* desktop */
+    @media (min-width: 1200px) {
+    }
+    /* tablet */
+    @media (min-width: 768px) and (max-width: 1199px) {
+    }
+    /* phone */
+    @media (max-width: 767px) {
+}
+</style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <title>Homework On Sorting</title>
+    <link rel='stylesheet' href='../style.css'>
+</head>
+
+<body
+    style='padding-top: 40px;' ## for navbar
+    >
+        
+    <div class='navbar-fixed-top navbar piqunity'>
+        <div class='navbar-inner'>
+            <div class='container'>
+                <a class='brand lsf-icon' title='book' 
+                   href='http://dblab.cs.toronto.edu/courses/443/2013' id='home-link'>
+                    Home
+                </a>
+                <ul class='nav' id='main-navbar'>
+                    <li class='dropdown'>
+                        <a href='homework.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            TOC <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li><a href="homework.html#" click="scrollto [sysuid=uid_2]">1. Introduction</a><ul></ul><li><a href="homework.html#" click="scrollto [sysuid=uid_3]">2. Multiway mergesort</a><ul><li><a href="homework.html#" click="scrollto [sysuid=uid_9]">2.1. Create runs using in-memory sort</a><ul></ul><li><a href="homework.html#" click="scrollto [sysuid=uid_10]">2.2. Iterating over runs</a><ul></ul><li><a href="homework.html#" click="scrollto [sysuid=uid_11]">2.3. Merging input iterators</a><ul></ul><li><a href="homework.html#" click="scrollto [sysuid=uid_12]">2.4. $k$-way merge sort</a><ul></ul><li><a href="homework.html#" click="scrollto [sysuid=uid_13]">2.5. Experiments and plots</a><ul></ul></ul><li><a href="homework.html#" click="scrollto [sysuid=uid_4]">3. Sorting using B+ tree</a><ul></ul><li><a href="homework.html#" click="scrollto [sysuid=uid_5]">4. Share!</a><ul></ul>
+                        </ul>
+                    </li>
+
+
+                    <li>
+                        <a id='navbar-scrollspy'></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class='content'>
+        <article sysuid="uid_0" data-meta='{"title": "Homework On Sorting", "author": "CSC443"}'><section class="coverpage"><h1><span></span>Homework On Sorting</h1><h2>CSC443</h2><p></p></section>
+
+<section md="yes" sysuid="uid_2" section_number="1."><h1>1. Introduction</h1><div><p>In this practical learning unit, you will play with
+different ways of sorting data on disk.  The data file consists of fixed
+length strings separated by the newline <code>'\n'</code> character.</p>
+<p>The file format is very simple.  The file consists of 8
+byte segments, with the first 7 bytes being a string,
+and the 8th byte the newline character.</p></div><center><div sysuid="uid_6" style="max-width: 600px;width: 100%">
+        <table class="table table-bordered" heading="yes" sysuid="uid_18"><tr sysuid="uid_32"><th sysuid="uid_35">column 0-7</th><th sysuid="uid_36">column 8</th></tr>
+<tr sysuid="uid_33"><td sysuid="uid_37">        characters</td><td sysuid="uid_38"><code sysuid="uid_39">\n</code></td></tr>
+</table>
+    </div></center><div><p>Therefore, it makes sense to define a record as</p></div><pre annotated="yes" sysuid="uid_7" data-blocks='{"record": {"start": 0}}' class="program prettyprint linenums:1">typedef char[9] Record; 
+</pre><div></div><div md="yes" align-middle=".record" sysuid="uid_8" class="margin margin-right"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_8]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div><div><p>Eventhough we have 8 bytes per string,
+we allocate 9 bytes because C string which uses a null
+character to terminate the string.</p></div></div></div></div></div><div><p>We are to experiment with two means of sorting:</p>
+<ol>
+<li>Multiway mergesort</li>
+<li>B+tree sort</li>
+</ol></div></section>
+
+<section sysuid="uid_3" section_number="2."><h1>2. Multiway mergesort</h1>
+
+
+    <section md="yes" sysuid="uid_9" section_number="2.1."><h1>2.1. Create runs using in-memory sort</h1><div><p>The first step in merge sort is to create the
+runs using an in-memory sorting algorithm.</p>
+<p>You are to implement a function:</p></div><pre class="dark program prettyprint linenums:1" annotated="yes" sysuid="uid_20" data-blocks='{"mk_runs": {"start": 4}}'>/**
+ * creates runs of length `run_length` in
+ * the `out_fp`.
+ */
+void mk_runs(FILE *in_fp, FILE *out_fp, long run_length); 
+</pre><div></div><div md="yes" align-middle=".mk_runs" sysuid="uid_21" class="margin margin-right"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_21]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div><div><p>This function needs to allocate (and free) a buffer
+to perform in-memory sorting.</p></div></div></div></div></div><div><p>If null-terminated C strings are used, you can use
+<a href="http://www.cplusplus.com/reference/cstdlib/qsort/">qsort()</a>:</p></div><pre sysuid="uid_22" class="program prettyprint linenums:1">
+void qsort ( void * base,
+             size_t num,
+             size_t size, 
+             int ( * compar ) ( const void *, const void * ) );
+</pre><div><p>The function <code>qsort</code> performs in-place sorting of
+the array <code>base</code> using the comparator function
+<code>compar</code>.</p>
+<p>Since, we only need to perform simple
+lexicographical based sorting of C-strings, we can
+just use the
+<a href="http://www.cplusplus.com/reference/cstring/strcmp/">strcmp</a>
+function.</p></div></section>
+
+    <section md="yes" sysuid="uid_10" section_number="2.2."><h1>2.2. Iterating over runs</h1><div><p>We need to read <em>each</em> runs in pages.  This is best
+done if we create a class which iterates over a
+<em>single</em> run using buffered I/O.</p>
+<p>Implement a class:</p></div><pre class="dark program prettyprint linenums:1" sysuid="uid_23">
+class RunIterator {
+    /**
+     * creates an iterator using the `buf_size` to
+     * scan through a run that starts at `start_pos`
+     * with length `run_length`
+     */
+    RunIterator(FILE *fp, long start_pos, long run_length, long buf_size);
+    /**
+     * reads the next record.  Returns null if
+     * iterator reads the end of the run.
+     */
+    Record next();
+}
+</pre><div></div></section>
+
+    <section md="yes" sysuid="uid_11" section_number="2.3."><h1>2.3. Merging input iterators</h1><div><p>Now, we need to implement the merging function.</p></div><pre class="dark program prettyprint linenums:1" sysuid="uid_24">
+void merge_runs(FILE *out_fp, 
+                RunIterator[] iterators, 
+                int num_iterators, 
+                long buf_size);
+</pre><div><p>The function merges the iterators using <code>long buf_size</code>,
+and writes the result to <code>FILE *out_fp</code>.
+This will create longer runs in <code>FILE *out_fp</code>.</p></div></section>
+
+    <section md="yes" sysuid="uid_12" section_number="2.4."><h1>2.4. $k$-way merge sort</h1><div><p>Finally, we can put things together and implement an
+executable with the following command line
+arguments:</p></div><pre class="dark program prettyprint linenums:1" sysuid="uid_25">
+msort &lt;input_file&gt; &lt;out_file&gt; &lt;mem_capacity&gt; &lt;k&gt;
+</pre><div><ul>
+<li>The <code>input_file</code> is the filename to be sorted.</li>
+<li>The <code>out_file</code> si the filename of the sorted file.</li>
+<li>The <code>mem_capacity</code> is the <em>total</em> allowed memory
+  during the sorting. Your program should not
+  allocate memory exceeding the memory capacity.</li>
+<li>The <code>k</code> is the <mathjax>$k$</mathjax>-way merge sort.</li>
+</ul>
+<p>You have to figure out the <code>long buf_size</code> to be
+used in the functions
+<code>RunIterator::RunIterator(...)</code> and
+<code>merge_runs(...)</code>.</p>
+<p>Your program should report the time it takes to
+complete the sorting.</p></div></section>
+
+    <section md="yes" sysuid="uid_13" section_number="2.5."><h1>2.5. Experiments and plots</h1><div><ul>
+<li>Measure the performance trend of <code>msort</code> with
+respect to different file sizes.</li>
+</ul></div><div class="important" sysuid="uid_26"><div><p>Fix the parameters <code>mem_capacity</code> and <code>k</code>.
+Plot the performance (in ms) versus different
+file sizes.  Try to generate <em>large</em> files (at
+least 4 GB files).</p></div></div><div><ul>
+<li>Measure the performance trend of <code>msort</code> with
+respect to different total memory allowed.</li>
+</ul></div><div class="important" sysuid="uid_27"><div><p>Fix the parameter <code>k</code> and the file size.
+Plot the performance (in ms) versus different
+choices of memory capacity.</p></div></div><div><ul>
+<li>Measure the performance trend of <code>msort</code> with
+respect to different choices of <code>k</code>.</li>
+</ul></div><div class="important" sysuid="uid_28"><div><p>Fix the file size and the memory capacity.
+Plot the performance (in ms) versus different
+choices of <code>k</code>.  Of course, <code>k</code> must be greater
+than 1.</p></div></div><div></div></section>
+</section>
+
+<section md="yes" sysuid="uid_4" section_number="3."><h1>3. Sorting using B+ tree</h1><div><p>Recall the usage of the 
+<a href="../tutorials/leveldb.html">LevelDB library</a> as a means of key/value
+store.</p>
+<p>We can use B+ tree to sort data that are too large to
+fit into memory.</p>
+<ul>
+<li>Implement an executable:</li>
+</ul></div><pre class="dark program prettyprint linenums:1" sysuid="uid_14">
+bsort &lt;input_file&gt; &lt;out_index&gt;
+</pre><div><p>Your program should use LevelDB to build a B+ tree index </p>
+<ul>
+<li>Compare the performance of <code>msort</code> against <code>bsort</code>.</li>
+</ul></div><div class="important" sysuid="uid_15"><div><p>Plot the performances of different ways of sorting
+against varying file sizes.  Plot the performance of
+at least three ways of sorting:
+1. using <code>bsort</code>
+2. using <code>msort</code> with somewhat <em>poorly chosen</em>
+parameters
+3. using <code>msort</code> with a <em>well tuned</em> parameters</p></div></div><div></div></section>
+
+<section sysuid="uid_5" section_number="4." class="uid_5"><h1>4. Share!</h1>
+    
+
+    <center class="important" sysuid="uid_17">
+    Clearly include the parameters in your plots. <br sysuid="uid_29">
+    Clearly label the x-y axes in your plots. <br sysuid="uid_30">
+    (Optional) Post your plot on Google Plus. <br sysuid="uid_31">
+    </center>
+</section>
+
+</article>
+    </div>
+
+        <script src="../static/3rdparty/jquery-1.8.2.min.js"></script>
+    <script src="../static/3rdparty/jQuery.jPlayer.2.2.0/jquery.jplayer.min.js"></script>
+    <script src="../static/3rdparty/popcorn-1.2/popcorn.js"></script>
+    <script src="../static/3rdparty/popcorn-1.2/popcorn.player.js"></script>
+    <script src="../static/3rdparty/jQuery.jPlayer.2.2.0/popcorn/popcorn.jplayer.js"></script>
+    <script src="../static/3rdparty/prettify/prettify.js"></script>    
+    <script src="../static/3rdparty/bootstrap-2.2.2/js/bootstrap.js"></script>
+    <script src="../static/3rdparty/sprintf-0.7-beta1.js"></script>
+
+    
+    <script> var piqunity = {staticurl: '../static'}; </script>
+    <script src="../static/utils.js"></script>
+    <script src="../static/j.actions.js"></script>
+    <script src="../static/j.baseevents.js"></script>
+    <script src="../static/j.carousel.js"></script>
+    <script src="../static/j.media.js"></script>
+    <script src="../static/j.nav.js"></script>
+    <script src="../static/j.navbar.js"></script>
+    <script src="../static/j.program.js"></script>
+    <script src="../static/j.quiz.js"></script>
+    <script src="../static/j.reading.js"></script>
+    <script src="../static/j.ref.js"></script>
+    <script src="../static/j.scrollspy.js"></script>
+    <script src="../static/j.margin.js"></script>
+
+    <script src="../static/piqunity.js"></script>
+    <script>$(function() {
+});
+</script>
+
+    
+
+
+</body>
+</html>

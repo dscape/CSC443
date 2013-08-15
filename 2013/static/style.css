@@ -1,0 +1,15 @@
+.important 
+{
+    border-left: 10px solid #aaa;
+    padding-left: 10px;
+}
+.disabled
+{
+    opacity: 0.5;
+}
+.smaller
+{
+    -webkit-transform: scale(0.8);
+    -webkit-transform-origin: 50% 50%;
+}
+em { text-decoration: underline; }

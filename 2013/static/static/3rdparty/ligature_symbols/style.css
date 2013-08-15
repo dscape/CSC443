@@ -1,0 +1,44 @@
+/* CSS */
+
+@font-face {
+    font-family: 'LigatureSymbols';
+    src: url('http://dblab.cs.toronto.edu/courses/443/2013/static/3rdparty/ligature_symbols/LigatureSymbols-2.07.eot');
+    src: url('LigatureSymbols-2.07.eot.html') format('embedded-opentype'),
+         url('LigatureSymbols-2.07.woff.html') format('woff'),
+         url('LigatureSymbols-2.07.ttf.html') format('truetype'),
+         url('LigatureSymbols-2.07.svg') format('svg');
+    src: url('LigatureSymbols-2.07.ttf.html') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+.lsf {
+  font-family: 'LigatureSymbols';
+  -webkit-text-rendering: optimizeLegibility;
+  -moz-text-rendering: optimizeLegibility;
+  -ms-text-rendering: optimizeLegibility;
+  -o-text-rendering: optimizeLegibility;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-font-smoothing: antialiased;
+  -ms-font-smoothing: antialiased;
+  -o-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+}
+
+.lsf-icon:before {
+  content:attr(title);
+  margin-right:0.3em;
+  font-size:130%;
+  font-family: 'LigatureSymbols';
+  -webkit-text-rendering: optimizeLegibility;
+  -moz-text-rendering: optimizeLegibility;
+  -ms-text-rendering: optimizeLegibility;
+  -o-text-rendering: optimizeLegibility;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-font-smoothing: antialiased;
+  -ms-font-smoothing: antialiased;
+  -o-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+}

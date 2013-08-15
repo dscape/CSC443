@@ -1,0 +1,190 @@
+<!doctype html>
+
+<html>
+<head>
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <link rel='icon' href="../static/images/db.png">
+    <link rel='stylesheet' href="../static/3rdparty/bootstrap-2.2.2/css/bootstrap.css">
+    <link rel='stylesheet' href="../static/3rdparty/bootstrap-2.2.2/css/bootstrap-responsive.css">
+    <link rel='stylesheet' href='../static/3rdparty/jQuery.jPlayer.2.2.0/skin/blue.monday/jplayer.blue.monday.css'>
+    <link rel='stylesheet' href='../static/3rdparty/ligature_symbols/style.css'>
+    <link rel='stylesheet' href='../static/3rdparty/prettify/prettify.css'>
+    <link href='../static/fonts/PT-serif.css' rel='stylesheet' type='text/css'>
+    <link href='../static/fonts/Inconsolata.css' rel='stylesheet' type='text/css'>
+    <link href='../static/fonts/Old-Standard-TT.css' rel='stylesheet' type='text/css'>
+
+    <link href='../static/piqunity.css' rel='stylesheet' type='text/css'>
+    <link href='../static/piqunity-reading.css' rel='stylesheet' type='text/css'>
+    <link href='../static/piqunity-lecture.css' rel='stylesheet' type='text/css'>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        messageStyle: 'simple',
+        showMathMenu: false,
+        skipStartupTypeset: false, /* TODO: */
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          skipTags: ["script","noscript","style","textarea"],
+          processEscapes: true
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }},
+        "HTML-CSS": { availableFonts: ["TeX"] }
+      });
+    </script>
+    <script type="text/javascript" src="../static/3rdparty/mathjax-2.0/MathJax.js"></script>
+
+    <style>
+    /* default */
+    /* desktop */
+    @media (min-width: 1200px) {
+    }
+    /* tablet */
+    @media (min-width: 768px) and (max-width: 1199px) {
+    }
+    /* phone */
+    @media (max-width: 767px) {
+}
+</style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <title>Basic Index</title>
+    <link rel='stylesheet' href='../style.css'>
+</head>
+
+<body
+    style='padding-top: 40px;' ## for navbar
+    >
+        
+    <div class='navbar-fixed-top navbar piqunity'>
+        <div class='navbar-inner'>
+            <div class='container'>
+                <a class='brand lsf-icon' title='book' 
+                   href='http://dblab.cs.toronto.edu/courses/443/2013' id='home-link'>
+                    Home
+                </a>
+                <ul class='nav' id='main-navbar'>
+                    <li class='dropdown'>
+                        <a href='homework.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            TOC <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li><a href="homework.html#" click="scrollto [sysuid=uid_2]">1. Introduction</a><ul></ul><li><a href="homework.html#" click="scrollto [sysuid=uid_3]">2. Experiments</a><ul></ul><li><a href="homework.html#" click="scrollto [sysuid=uid_4]">3. Organize your code</a><ul></ul>
+                        </ul>
+                    </li>
+
+
+                    <li>
+                        <a id='navbar-scrollspy'></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class='content'>
+        <article sysuid="uid_0" data-meta='{"title": "Basic Index", "author": "CSC443 Homework"}'><section class="coverpage"><h1><span></span>Basic Index</h1><h2>CSC443 Homework</h2><p></p></section>
+
+<section md="yes" sysuid="uid_2" section_number="1."><h1>1. Introduction</h1><div><p>We see how very simple indexing can speed up query performance.</p>
+<p>Start with a table schema with 100 attributes, and each attribute has 10
+bytes.</p>
+<p>Recall in <a href="../data-layout/homework.html" sysuid="uid_5">previous assignment</a>, you
+have a heapfile implementation based on fixed length record serialization,
+and used it to answer a selection-groupby query.</p>
+<p>In this assignment, we will attempt to speed up the same query by means of
+building a simple secondary index.</p>
+<p>The query we will try to answer is</p></div><pre class="prettyprint" sysuid="uid_6">
+        SELECT SUBSTRING(A2, 1, 5), COUNT(*) FROM T
+        WHERE A1 &gt;= <i font="red" class="nocode" sysuid="uid_12" style="color: red">start</i> AND A1 &lt;= <i font="red" class="nocode" sysuid="uid_13" style="color: red">end</i>
+        GROUP BY SUBSTRING(A2, 1, 5) </pre><div><p>The first observation we can make is that the query can be completely
+answered by a projection of table <code>T</code>, namely <mathjax>$\pi_\mathrm{A1,A2}(\mathrm{T})$</mathjax>.</p>
+<p>So, we will build an dense index on <code>T</code>.  Our index will be another heap
+file, but only storing <code>A1</code> and <code>A2</code>.</p></div></section>
+
+<section md="yes" sysuid="uid_3" section_number="2."><h1>2. Experiments</h1><div><ul>
+<li>
+<p>Generate a CSV file with random content, representing the table <code>T</code>.</p>
+</li>
+<li>
+<p>Create a heap file containing all attributes.</p>
+</li>
+</ul></div><pre class="dark program prettyprint" lineno="" sysuid="uid_7">
+$ csv2heapfile &lt;csv_file&gt; &lt;heap_file&gt;
+</pre><div><ul>
+<li>Run the query on the heap file, and record the time.</li>
+</ul></div><pre class="dark program prettyprint" lineno="" sysuid="uid_8">
+$ query &lt;heap_file&gt; &lt;start&gt; &lt;end&gt;
+</pre><div><ul>
+<li>Create a heap file containing only values of attributes <code>A1</code> and <code>A2</code>.</li>
+</ul></div><pre class="dark program prettyprint" lineno="" sysuid="uid_9">
+$ csv2idxfile &lt;csv_file&gt; &lt;index_heap_file&gt;
+</pre><div><ul>
+<li>Run the query using the index heap file, and record the time.</li>
+</ul></div><pre class="dark program prettyprint" lineno="" sysuid="uid_10">
+$ query_idx_heapfile &lt;index_heap_file&gt;
+</pre><div><ul>
+<li>Compare the performance of the two implementations and SQLite.</li>
+</ul></div></section>
+
+<section sysuid="uid_4" section_number="3."><h1>3. Organize your code</h1>
+
+    <pre lineno="" sysuid="uid_11" class="program prettyprint">
+# Makefile
+
+library.o: library.cc library.h
+    g++ -o library.o library.cc
+
+csv2heapfile: csv2heapfile.cc library.o
+    g++ -o \$@ $&lt; library.o
+
+csv2idxfile: csv2idxfile.cc library.o
+    g++ -o \$@ $&lt; library.o
+
+query: query.cc library.o
+    g++ -o \$@ $&lt; library.o
+
+query_idx_heapfile: query_idx_heapfile.cc library.o
+    g++ -o \$@ $&lt; library.o
+</pre>
+
+</section>
+</article>
+    </div>
+
+        <script src="../static/3rdparty/jquery-1.8.2.min.js"></script>
+    <script src="../static/3rdparty/jQuery.jPlayer.2.2.0/jquery.jplayer.min.js"></script>
+    <script src="../static/3rdparty/popcorn-1.2/popcorn.js"></script>
+    <script src="../static/3rdparty/popcorn-1.2/popcorn.player.js"></script>
+    <script src="../static/3rdparty/jQuery.jPlayer.2.2.0/popcorn/popcorn.jplayer.js"></script>
+    <script src="../static/3rdparty/prettify/prettify.js"></script>    
+    <script src="../static/3rdparty/bootstrap-2.2.2/js/bootstrap.js"></script>
+    <script src="../static/3rdparty/sprintf-0.7-beta1.js"></script>
+
+    
+    <script> var piqunity = {staticurl: '../static'}; </script>
+    <script src="../static/utils.js"></script>
+    <script src="../static/j.actions.js"></script>
+    <script src="../static/j.baseevents.js"></script>
+    <script src="../static/j.carousel.js"></script>
+    <script src="../static/j.media.js"></script>
+    <script src="../static/j.nav.js"></script>
+    <script src="../static/j.navbar.js"></script>
+    <script src="../static/j.program.js"></script>
+    <script src="../static/j.quiz.js"></script>
+    <script src="../static/j.reading.js"></script>
+    <script src="../static/j.ref.js"></script>
+    <script src="../static/j.scrollspy.js"></script>
+    <script src="../static/j.margin.js"></script>
+
+    <script src="../static/piqunity.js"></script>
+    <script>$(function() {
+});
+</script>
+
+    
+
+
+</body>
+</html>

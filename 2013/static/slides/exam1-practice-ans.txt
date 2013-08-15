@@ -1,0 +1,69 @@
+Q1:  FTTFFFF
+ 
+======================================
+Q2 
+
+Let M, N be the number of pages in the relations Emp, Dept respectively. 
+
+M = 1.000.000 / 50 = 20.000 I/Os
+N = 500 / 50 = 10 I/Os
+
+### Simple page-oriented Nested Loops Join
+
+>From theory we know that:
+   Cost: M + M * N
+
+So, in the example is:
+   Cost_1 (Emp as outer): 20.000 + 20.000 * 10 = 220.000 I/Os
+   Cost_2 (Dept as outer): 10 + 10 * 20.000 = 200.010 I/Os
+
+
+### Block Nested Loops Joins
+
+We know from theory that:
+if the smaller relation fits in memory then:
+   Cost = M + N
+else
+   Cost = M + N * (M / (B-2))
+
+In our example the smaller relation (i.e., Dept) doesn't fit in memory. We only have B=4 buffers available in total, from which only  2 can be used for storing the outer relation (since we need at least 1 buffer for reading the inner relation and 1 for producing the output), while Dept requires N=10 buffer pages (i.e., number of pages) to be stored. So, in our example it is:
+   Cost_1 (Emp as outer)  = M + N * (M / (B-2)) = 20.000 + 10 * (20.000 / 2) = 120.000 I/Os
+   Cost_2 (Dept as outer) = M + N * (M / (B-2)) = 10 + 20.000 * (10 / 2) = 100.010 I/Os
+
+
+### Index Nested Loops Joins
+
+>From theory we know that we should make the inner relation the one on which we have defined an index on the attribute to be joined, in this example, we have an appropriate index on both relations. If Dept is the outer relation, then it is: 
+   Cost = N + ( (N x #Tuples_Per_Page) x Cost of retrieving matching tuples from inner relation using the index)
+
+The cost of retrieving matching tuples depends on the kind of index and the number of matching tuples. 
+
+If the index on inner relation is a B+-tree then 2-4 I/Os per tuple are needed to find the appropriate leaf. If it is a Hash index then 1-2 I/Os per tuple are needed to find the appropriate bucket. Once the appropriate leaf or bucket is found, the cost of retrieving the matching tuples depends on whether the index is clustered. If it is clustered then we can assume that the cost per outer tuple is typically 1 more I/0. If the index is not clustered, then the cost could be one I/O per matching inner tuple (since each of these could be on a different page in the worst case). Note here that even if the index is clustered, retrieving data may require more than one I/O, depending on the size of each page and the number of matching tuples.
+
+In our example, if Dept is the outer and Emp the inner as we have defined a clustered B+-tree index on Emp.Dept. Then it is:
+
+   Cost: 10 + ((10 * 50) * Cost of retrieving matching tuples from inner relation using the index)
+
+We know that the number of distinct values of Emp.Dept is 500, therefore there will be matching tuples for all tuples of the outer relation. Moreover, if we assume that the matching data is uniformly distributed (i.e., same number of employees in each department) we can conclude that each B+tree index leaf corresponds to 1.000.000/500 = 2.000 tuples. So, to retieve the inner relation tuples that correspond to each outer relation tuple using the index we will need an extra 2.000/50 = 40 I/Os. In total it is:
+
+  Cost: 10 + ( (10 * 50) * (4 + 40) ) = 22010 I/Os
+
+We assumed that 4 I/Os are required to access each leaf page (on average). Note that the number of I/Os needed to retrieve each leaf in the B+-tree depends on the height of the B+-tree. The height of the tree depends on the number of tuples to be indexed and the branching factor m of the tree. The branching factor m depends on the number of pairs that can be saved in each leaf page. In our example we have 1.000.000 tuples and each page can save 100 pairs of values, which suggests a tree height of 3-4.
+
+A similar calculation can be done for Emp as the outer using the unclustered B+tree on Dept.Name (keep in mind that Dept.Name is unique). 
+
+  Cost:  22,000 + 1,000,000 (cost of retrieving matching Dept tuples) 
+
+### Sort-Merge Joins
+
+>From theory we know that: 
+   Cost = Sorting of M + Sorting of N + M + N
+or,
+   Cost = O(MlogM) + O(NlogN) + M + N
+
+In our example, the cost of sorting the two relation is given, so it is:
+   Cost = 22.000 + 30 + 20.000 + 10 = 42,040 I/Os
+
+
+### Resolution
+Our analysis suggests that the lowest cost join plan would be the Index Nested Loop Join with.

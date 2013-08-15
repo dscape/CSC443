@@ -1,0 +1,193 @@
+<!doctype html>
+
+<html>
+<head>
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <link rel='icon' href="static/images/db.png">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap.css">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap-responsive.css">
+    <link rel='stylesheet' href='static/3rdparty/jQuery.jPlayer.2.2.0/skin/blue.monday/jplayer.blue.monday.css'>
+    <link rel='stylesheet' href='static/3rdparty/ligature_symbols/style.css'>
+    <link rel='stylesheet' href='static/3rdparty/prettify/prettify.css'>
+    <link href='static/fonts/PT-serif.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Inconsolata.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Old-Standard-TT.css' rel='stylesheet' type='text/css'>
+
+    <link href='static/piqunity.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-reading.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-lecture.css' rel='stylesheet' type='text/css'>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        messageStyle: 'simple',
+        showMathMenu: false,
+        skipStartupTypeset: false, /* TODO: */
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          skipTags: ["script","noscript","style","textarea"],
+          processEscapes: true
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }},
+        "HTML-CSS": { availableFonts: ["TeX"] }
+      });
+    </script>
+    <script type="text/javascript" src="static/3rdparty/mathjax-2.0/MathJax.js"></script>
+
+    <style>
+    /* default */
+    /* desktop */
+    @media (min-width: 1200px) {
+    }
+    /* tablet */
+    @media (min-width: 768px) and (max-width: 1199px) {
+    }
+    /* phone */
+    @media (max-width: 767px) {
+}
+</style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <title>Introduction</title>
+    <link rel='stylesheet' href='style.css'>
+</head>
+
+<body
+    style='padding-top: 40px;' ## for navbar
+    >
+        
+    <div class='navbar-fixed-top navbar piqunity'>
+        <div class='navbar-inner'>
+            <div class='container'>
+                <a class='brand lsf-icon' title='book' 
+                   href='http://dblab.cs.toronto.edu/courses/443/2013' id='home-link'>
+                    Home
+                </a>
+                <ul class='nav' id='main-navbar'>
+                    <li class='dropdown'>
+                        <a href='01.introduction.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            TOC <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li><a href="01.introduction.html#" click="scrollto [sysuid=uid_2]">1. Database management</a><ul><li><a href="01.introduction.html#" click="scrollto [sysuid=uid_5]">1.1. Data modeling</a><ul></ul><li><a href="01.introduction.html#" click="scrollto [sysuid=uid_6]">1.2. Storage modeling</a><ul></ul></ul><li><a href="01.introduction.html#" click="scrollto [sysuid=uid_3]">2. About this course</a><ul></ul>
+                        </ul>
+                    </li>
+
+
+                    <li>
+                        <a id='navbar-scrollspy'></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class='content'>
+        <article sysuid="uid_0" data-meta='{"title": "Introduction", "author": "CSC443, Winter 2013"}'><section class="coverpage"><h1><span></span>Introduction</h1><h2>CSC443, Winter 2013</h2><p></p></section>
+
+<section markdown="yes" sysuid="uid_2" section_number="1."><h1>1. Database management</h1><div><p>In the simplest form of data manage, we need to store bytes of data for
+later retrieval.  The simplest model that describe the majority of the
+medium (known as memory or storage) in which data can reside is:</p>
+<ol>
+<li>the medium stores data in units of bytes with linearly addressable space
+   form 0 to N-1, where N is the capacity in bytes of the medium.</li>
+<li>the medium supports read and write operations.</li>
+</ol></div><pre sysuid="uid_4" class="program prettyprint linenums:1">
+class Memory {
+    byte read(address)
+    void write(address, byte)
+}
+</pre><div><p>Each operation takes some time to complete.  The time it takes to complete
+the data read/write is known as data access latency.</p>
+<p>In a way, all database management systems can be reduced to byte-level
+read/write to some linearly addressable storage medium.  However such
+over-simplification is completely pathological as a practical system
+requires a much richer abstraction to confront real-life issues.</p></div><section markdown="yes" sysuid="uid_5" section_number="1.1."><h1>1.1. Data modeling</h1><div><p>Real life data are naturally expressible by data structures.  In the
+relational data model, there exists a natural data hierarchy:</p>
+<ul>
+<li>Scalars: numbers, strings, date time, blobs</li>
+<li>Tuples or records</li>
+<li>Relations or tables</li>
+<li>Databases</li>
+<li>Database clusters</li>
+</ul>
+<p>Data processing algorithms need to process data in the units of the data
+model.  It's simply infeasible to express any nontrivial algorithm in terms
+of data I/O at the byte-level.</p>
+<p><em>CSC343 deals with the data model part of data management.</em></p></div></section><div></div><section markdown="yes" sysuid="uid_6" section_number="1.2."><h1>1.2. Storage modeling</h1><div><p>Different families of data storage medium technologies have been
+introduced ever since the invention of computers.  They are designed to
+co-exist and complement each other to maximize the efficiency of data
+processing.  It's important to distinguish them in terms of the
+following properties:</p></div><center><div sysuid="uid_7" style="max-width: 600px;width: 100%">
+            <table record="," class="table table-striped table-bordered" heading="yes" sysuid="uid_8"><tr sysuid="uid_9"><th sysuid="uid_15">Property        </th><th sysuid="uid_16"> Difference in technology</th></tr>
+<tr sysuid="uid_10"><td sysuid="uid_17">            Affordability   </td><td sysuid="uid_18"> inexpensive / expensive</td></tr>
+<tr sysuid="uid_11"><td sysuid="uid_19">            Capacity        </td><td sysuid="uid_20"> small / large</td></tr>
+<tr sysuid="uid_12"><td sysuid="uid_21">            Performance     </td><td sysuid="uid_22"> slow / fast</td></tr>
+<tr sysuid="uid_13"><td sysuid="uid_23">            Persistence     </td><td sysuid="uid_24"> volatile / nonvolatile</td></tr>
+<tr sysuid="uid_14"><td sysuid="uid_25">            Reliability     </td><td sysuid="uid_26"> low error rate / high error rate</td></tr>
+</table>
+        </div></center><div><p>While a linearly addressable byte array quite accurate model for most
+data storage mediums, It's quite complex to accurately model data access
+latency.</p>
+<p>In the first part of this course, we will present a much more accurate
+model of data storage technologies of the modern computer system.  One
+will see that there is are different forms of data storage medium with
+different properties.  We will refer to the collection of data storage
+mediums as the <em>memory hierarchy</em>.</p></div></section><div></div></section>
+
+<section md="yes" sysuid="uid_3" section_number="2."><h1>2. About this course</h1><div><p>This course discusses the detailed modeling and characteristics
+of the memory hierarchy.  We will revisit the relational data model and its
+query language, and investigate their connection to the memory hierarchy.</p>
+<p>We will begin with:</p>
+<ul>
+<li>data arrangement in different levels of the memory hierarchy</li>
+<li>algorithms that work with the whole memory hierarchy</li>
+<li>compilation of relational queries to such algorithms</li>
+</ul>
+<hr>
+<ul>
+<li>concurrency</li>
+<li>crash and recovery</li>
+<li>parallel databases</li>
+<li>non relational databases</li>
+</ul></div></section>
+</article>
+    </div>
+
+        <script src="static/3rdparty/jquery-1.8.2.min.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/jquery.jplayer.min.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.player.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/popcorn/popcorn.jplayer.js"></script>
+    <script src="static/3rdparty/prettify/prettify.js"></script>    
+    <script src="static/3rdparty/bootstrap-2.2.2/js/bootstrap.js"></script>
+    <script src="static/3rdparty/sprintf-0.7-beta1.js"></script>
+
+    
+    <script> var piqunity = {staticurl: 'static'}; </script>
+    <script src="static/utils.js"></script>
+    <script src="static/j.actions.js"></script>
+    <script src="static/j.baseevents.js"></script>
+    <script src="static/j.carousel.js"></script>
+    <script src="static/j.media.js"></script>
+    <script src="static/j.nav.js"></script>
+    <script src="static/j.navbar.js"></script>
+    <script src="static/j.program.js"></script>
+    <script src="static/j.quiz.js"></script>
+    <script src="static/j.reading.js"></script>
+    <script src="static/j.ref.js"></script>
+    <script src="static/j.scrollspy.js"></script>
+    <script src="static/j.margin.js"></script>
+
+    <script src="static/piqunity.js"></script>
+    <script>$(function() {
+});
+</script>
+
+    
+
+
+</body>
+</html>

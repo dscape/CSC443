@@ -1,0 +1,296 @@
+<!doctype html>
+
+<html>
+<head>
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <link rel='icon' href="static/images/db.png">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap.css">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap-responsive.css">
+    <link rel='stylesheet' href='static/3rdparty/jQuery.jPlayer.2.2.0/skin/blue.monday/jplayer.blue.monday.css'>
+    <link rel='stylesheet' href='static/3rdparty/ligature_symbols/style.css'>
+    <link rel='stylesheet' href='static/3rdparty/prettify/prettify.css'>
+    <link href='static/fonts/PT-serif.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Inconsolata.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Old-Standard-TT.css' rel='stylesheet' type='text/css'>
+
+    <link href='static/piqunity.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-reading.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-lecture.css' rel='stylesheet' type='text/css'>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        messageStyle: 'simple',
+        showMathMenu: false,
+        skipStartupTypeset: false, /* TODO: */
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          skipTags: ["script","noscript","style","textarea"],
+          processEscapes: true
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }},
+        "HTML-CSS": { availableFonts: ["TeX"] }
+      });
+    </script>
+    <script type="text/javascript" src="static/3rdparty/mathjax-2.0/MathJax.js"></script>
+
+    <style>
+    /* default */
+    /* desktop */
+    @media (min-width: 1200px) {
+    }
+    /* tablet */
+    @media (min-width: 768px) and (max-width: 1199px) {
+    }
+    /* phone */
+    @media (max-width: 767px) {
+}
+</style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <title>Information Retrieval</title>
+    <link rel='stylesheet' href='style.css'>
+</head>
+
+<body
+    style='padding-top: 40px;' ## for navbar
+    >
+        
+    <div class='navbar-fixed-top navbar piqunity'>
+        <div class='navbar-inner'>
+            <div class='container'>
+                <a class='brand lsf-icon' title='book' 
+                   href='http://dblab.cs.toronto.edu/courses/443/2013' id='home-link'>
+                    Home
+                </a>
+                <ul class='nav' id='main-navbar'>
+                    <li class='dropdown'>
+                        <a href='08.keyword-search.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            TOC <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li><a href="08.keyword-search.html#" click="scrollto [sysuid=uid_2]">1. Introduction</a><ul></ul><li><a href="08.keyword-search.html#" click="scrollto [sysuid=uid_3]">2. Basic data model</a><ul></ul><li><a href="08.keyword-search.html#" click="scrollto [sysuid=uid_4]">3. Boolean retrieval</a><ul><li><a href="08.keyword-search.html#" click="scrollto [sysuid=uid_7]">3.1. Boolean queries</a><ul></ul><li><a href="08.keyword-search.html#" click="scrollto [sysuid=uid_8]">3.2. Inverted index</a><ul></ul></ul><li><a href="08.keyword-search.html#" click="scrollto [sysuid=uid_5]">4. Vector space models</a><ul><li><a href="08.keyword-search.html#" click="scrollto [sysuid=uid_9]">4.1. Drawback of boolean queries</a><ul></ul><li><a href="08.keyword-search.html#" click="scrollto [sysuid=uid_10]">4.2. Term weight using TFIDF scores</a><ul></ul><li><a href="08.keyword-search.html#" click="scrollto [sysuid=uid_11]">4.3. Query by similarity</a><ul></ul></ul>
+                        </ul>
+                    </li>
+
+
+                    <li>
+                        <a id='navbar-scrollspy'></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class='content'>
+        <article sysuid="uid_0" data-meta='{"title": "Information Retrieval", "author": "CSC443"}'><section class="coverpage"><h1><span></span>Information Retrieval</h1><h2>CSC443</h2><p></p></section>
+
+<section md="yes" sysuid="uid_2" section_number="1."><h1>1. Introduction</h1><div><p>In this article, we digress from the relational data model to 
+the data model, storage and query processing of
+unstructured text data.</p></div></section>
+
+<section md="yes" sysuid="uid_3" section_number="2."><h1>2. Basic data model</h1><div><p>Text documents are still the dominant component of the
+World Wide Web, making it arguably the largest open
+database in existence.  In this section, we describe the formal data models
+of such text databases.</p></div><ul class="nav nav-tabs"><li class="active"><a href="08.keyword-search.html#uid_6" data-toggle="tab">Text database & Documents</a></li></ul><div class="tab-content"><div md="yes" class="important tab-pane fade in active" sysuid="uid_6" active="yes" id="uid_6"><div><p>A text database <mathjax>$D$</mathjax> is a set of <em>documents</em>.
+<mathjax>$$ D = \{d_i: i\in\mathbb{N}\} $$</mathjax>
+Each document, <mathjax>$d_i$</mathjax>, is a sequence of <em>words</em>:
+<mathjax>$$ d_i = \left\lt
+    w_{i1}, w_{i2}, \dots, w_{in}
+    \right\gt
+$$</mathjax></p>
+<p>A document can also be viewed as a <em>bag of words</em>.</p>
+<p><mathjax>$$\mathrm{bag}(d_i) = \{\{\ w_{ij}: j\leq |d_i|\ \}\}$$</mathjax>
+Here we use <mathjax>$\{\{\dots\}\}$</mathjax> to denote bags or multisets.
+When treating <mathjax>$d_i$</mathjax> as <mathjax>$\mathrm{bag}(d_i)$</mathjax>, we simply ignore the
+ordering of words in <mathjax>$d_i$</mathjax>, but still keep track of the frequency of
+occurrance in <mathjax>$d_i$</mathjax>.</p>
+<p>Similarly, we can also view a document as a <em>set of words</em>.
+<mathjax>$$\mathrm{set}(d_i) = \{\ w_{ij}: j\leq |d_i|\ \}$$</mathjax>
+When treating <mathjax>$d_i$</mathjax> as <mathjax>$\mathrm{set}(d_i)$</mathjax>, we are ignoring the
+frequency of occurrance as well as the ordering.</p></div></div></div><div><p>When there is no risk of ambiguity, we may write <mathjax>$\mathrm{bag}(d)$</mathjax> or
+<mathjax>$\mathrm{set}(d)$</mathjax> simply as <mathjax>$d$</mathjax>.  Namely, for brevity, we can think of the
+documents simply as bags or sets of words.</p></div></section>
+
+<section md="yes" sysuid="uid_4" section_number="3."><h1>3. Boolean retrieval</h1><div><p>Let's begin by considering the most basic form of text queries:
+<em>boolean retrieval</em>.</p></div><section md="yes" sysuid="uid_7" section_number="3.1."><h1>3.1. Boolean queries</h1><div><p>Let <mathjax>$D$</mathjax> be a text database.  A query word <mathjax>$u$</mathjax> is simply a word.
+One can define <mathjax>$D(u)$</mathjax> as all documents containing the word <mathjax>$q$</mathjax>:
+<mathjax>$$ D(u) = \{d\in D: u\in\mathrm{set}(d)\} $$</mathjax></p>
+<p>A <em>boolean retrieval</em> query, or simply boolean queries, <mathjax>$q$</mathjax>, is defined
+as a set of (word, operator) pairs, where the operator can be {and, or,
+not}.  The semantics of the boolean queries is to retrieve a list of
+documents which must contain words from <mathjax>$(u, and)$</mathjax>, and
+contain one or more words from <mathjax>$(u, or)$</mathjax>, but do not contain words from <mathjax>$(u, not)$</mathjax>.  Each
+such pair (word, operator) is known as a <em>query term</em>.</p></div></section><div></div><section md="yes" sysuid="uid_8" section_number="3.2."><h1>3.2. Inverted index</h1><div><p>To answer boolean queries efficiently, text databases are indexed by an
+<em>inverted index</em> data structure.</p>
+<p>An inverted index is a disk based data structure that stores</p>
+<ul>
+<li>a dictionary of words found in the database.</li>
+<li>for each word in the dictionary, a <em>posting</em> list which contains
+  the document references that contain that word.</li>
+</ul>
+<p>The dictionary of words is the set of words from all the documents in
+the database:
+<mathjax>$$\mathrm{dict}(D) = \bigcup_{d\in D}\mathrm{set}(d)$$</mathjax></p>
+<p>The posting list of a word <mathjax>$w\in\mathrm{dict}(D)$</mathjax> is the <em>sorted</em> list of
+IDs of all the document containing <mathjax>$w$</mathjax>:</p>
+<p><mathjax>$$\mathrm{posts}(w) = \mathrm{sorted}
+    \{\mathrm{id}(d): d\in D(w)\}
+$$</mathjax></p>
+<p>The frequency of a word <mathjax>$w$</mathjax> is the number of documents that contains
+<mathjax>$w$</mathjax>:
+<mathjax>$$\mathrm{freq}(w) = |D(w)|$$</mathjax></p>
+<p>The inverted list is a <em>disk based</em> data structure that maps <code>(word,
+frequency)</code> to the respective posting lists.</p>
+<p>The inverted index can be abstracted as follows. </p></div><pre sysuid="uid_12" class="program prettyprint linenums:1">
+struct InvertedIndex {
+    Set&lt;Word&gt; dictionary;
+    Map&lt;Word, Integer&gt; freq;
+    Map&lt;Word, SortedList&lt;DocID&gt;&gt; postings;
+}
+</pre><div><p>Given a query <mathjax>$q = \{ (u_i, op_i) \}_{1\leq i\leq n}$</mathjax> where
+<mathjax>$u_i$</mathjax> are the query words and <mathjax>$op_i\in\{and, or, not\}$</mathjax> are the
+operators, the query evaluation is done as:</p></div><center><div md="yes" sysuid="uid_13" style="max-width: 600px;width: 100%"><div><ol>
+<li>Locate the posting lists of each <mathjax>$u_i$</mathjax>:
+   <mathjax>$$\mathrm{postings}(u_i)$$</mathjax></li>
+<li>Perform union of all the posting results of the <code>or</code>-query terms to
+   form an intermediate result:
+   <mathjax>$$ \mathrm{result} \leftarrow 
+      \biguplus_{i : op_i=or}\mathrm{postings}(u_i)
+   $$</mathjax>
+   Note that we use the bag-union <mathjax>$\uplus$</mathjax> so the multiplicity of the
+   documents are kept.  This is used to perform ranking of documents by
+   the number of <code>or</code>-query terms they contain - the more the better.</li>
+<li>Perform the intersection of the intermediate result with the posting
+   lists of the <code>and</code>-terms:
+   <mathjax>$$ \mathrm{result} \leftarrow
+      \mathrm{result}\ \cap
+      \left(\bigcap_{i : op_i = and}\mathrm{postings}(u_i)\right)
+   $$</mathjax>
+   We use <em>set</em> intersection between <code>result</code> and the postings.</li>
+<li>Perform (<em>set</em>) complement of the intermediate result with the
+   postings of the <code>not</code>-terms.
+   <mathjax>$$ \mathrm{result} \leftarrow
+      \mathrm{result} \setminus \left(
+      \bigcup_{i : op_i = not}\mathrm{postings}(u_i) \right)
+   $$</mathjax>
+   Again, we use set complement so all documents containing <code>not</code>-terms
+   are completely removed from the <code>result</code> set.</li>
+<li>Rank the documents in <code>result</code> based on their multiplicity (from 2.).</li>
+</ol></div></div></center><div><p>Note that the posting list merging operations (2., 3., 4.) can take
+advantage of the fact that all posting lists in the inverted index
+are sorted.</p></div></section><div></div></section>
+
+<section sysuid="uid_5" section_number="4."><h1>4. Vector space models</h1>
+
+    <section md="yes" sysuid="uid_9" section_number="4.1."><h1>4.1. Drawback of boolean queries</h1><div><p>Boolean queries are effective only if the query terms are well chosen
+and the operators are properly selected.
+However, quite often, the query terms are from natural language text
+containing words such as <em>the</em>, <em>and</em>, <em>a</em>, <em>of</em>, ...  The operators are
+often left as the default of <code>or</code>.  (This is the case for most Google
+search queries.)</p>
+<p>The naive evaluation of boolean queries would include many irrelevant
+documents in the result because of the very popular, but unimportant,
+query terms.</p>
+<p>One remedy of the problem is to declare the unimportant words as <em>stop
+words</em>, and remove them from the query before the search.
+A better solution is to assign weights to query terms in an automatic
+fashion.</p></div></section>
+
+    <section md="yes" sysuid="uid_10" section_number="4.2."><h1>4.2. Term weight using TFIDF scores</h1><div><p>Vector space models of text documents abstract documents as (very) high
+dimensional vectors.  It is viewed that each word in the dictionary of
+the database is a dimension.  Thus, the dimensionality of the vector
+space is <mathjax>$|\mathrm{dict}(D)|$</mathjax> which can be in the order of <mathjax>$10^5$</mathjax>.</p>
+<p>A document is a vector in this vector space.  This is necessarily
+viewing the documents as <em>bags of words</em> as vectors do not capture the
+sequence information of words in a document.</p>
+<p>Formally, the basis vectors of the space are:
+<mathjax>$$B = \{ \hat w_i: w_i\in\mathrm{dict}(D)\} $$</mathjax></p>
+<p>A document <mathjax>$d$</mathjax> is a vector of the form:
+<mathjax>$$ \vec d = \sum_{w\in \mathrm{dict}(D)}\alpha(w,d)\cdot \hat w $$</mathjax>
+The coefficient <mathjax>$\alpha(w,d)$</mathjax> depends on the importance of the word
+<mathjax>$w$</mathjax> in the document <mathjax>$d$</mathjax>, as well as a data-wide importance measure of
+<mathjax>$w$</mathjax>.</p>
+<p><strong>Term frequency</strong></p></div><center><div md="yes" sysuid="uid_14" style="max-width: 600px;width: 100%"><div><p>The term frequency, denoted <mathjax>$tf(w,d)$</mathjax>, is a normalized frequency of the
+word <mathjax>$w$</mathjax> in a document <mathjax>$d$</mathjax>, defined as follows.</p>
+<p>Let <mathjax>$\#(w\in d)$</mathjax> be the frequency of occurance of <mathjax>$w$</mathjax> in <mathjax>$d$</mathjax>.
+<mathjax>$$ tf(w,d) = \frac{\#(w\in d)}
+                  {\max\{\#(v\in d): v\in d\}}
+$$</mathjax></p>
+<p>Note <mathjax>$tf(w,d)\in[0, 1]$</mathjax>.  It measures the importance of the word <mathjax>$w$</mathjax> in
+the document <mathjax>$d$</mathjax>.</p></div></div></center><div><p><strong>Inverse document frequency</strong></p></div><center><div md="yes" sysuid="uid_15" style="max-width: 600px;width: 100%"><div><p>The inverse document frequency, denoted <mathjax>$idf(w, D)$</mathjax> measures the
+importance of a word over the entire database.  The intuition is
+that if a word is to appear in many documents, then it's most likely
+unimportant.</p>
+<p><mathjax>$$ idf(w,D) = \log\left[
+                \frac{|D|}
+                     {|d\in D: w\in d|}
+              \right]
+            = \log\left[
+                \frac{|D|}{|D(w)|}
+              \right]
+$$</mathjax></p>
+<p>For commonly occurring words such as <em>"the"</em> in a database of news
+articles, the idf would be
+<mathjax>$$ idf(\mathsf{the}, D) 
+  = \log(|D|/|D(\mathsf{the})|) \approx \log(1) = 0 $$</mathjax></p></div></div></center><div><p>The tf-idf vector space model uses the product of tf and idf measures
+to compute the coefficients of the vector representation of documents.</p>
+<p><mathjax>$$ tfidf(w,d) = tf(w,d)\cdot idf(w,D) $$</mathjax></p>
+<p>Finally, we have:</p>
+<p><mathjax>$$ \vec d = \sum_{w\in \mathrm{dict}(D)}tfidf(w,d)\cdot \hat w $$</mathjax></p></div></section>
+
+    <section md="yes" sysuid="uid_11" section_number="4.3."><h1>4.3. Query by similarity</h1><div><p>Given two documents, <mathjax>$d_1$</mathjax> and <mathjax>$d_2$</mathjax>, we can define their similarity as
+the correlation of the two vectors:
+<mathjax>$$\mathrm{sim}(d_1, d_2) = 
+    \frac{\sum_{w}\alpha(w,d_1)\cdot\alpha(w,d_2)}
+         {\|d_1\|\cdot \|d_2\|}
+$$</mathjax></p>
+<p>The vector space model permits us to define a new semantics to keyword
+query evaluation:</p>
+<p>Given a query <mathjax>$q$</mathjax> with terms, <mathjax>$\{u_i\}$</mathjax>, treat the query as a document
+itself, and search all documents in <mathjax>$D$</mathjax> ranked according to
+<mathjax>$\mathrm{sim}(q,d)$</mathjax>.</p>
+<p>Typical search engines provide both search by similarity and search by
+boolean queries.  So, the user can specify logical operators (<code>and</code>,
+<code>or</code> and <code>not</code>) while still enjoying the document similarity ranking.</p></div></section>
+</section>
+</article>
+    </div>
+
+        <script src="static/3rdparty/jquery-1.8.2.min.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/jquery.jplayer.min.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.player.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/popcorn/popcorn.jplayer.js"></script>
+    <script src="static/3rdparty/prettify/prettify.js"></script>    
+    <script src="static/3rdparty/bootstrap-2.2.2/js/bootstrap.js"></script>
+    <script src="static/3rdparty/sprintf-0.7-beta1.js"></script>
+
+    
+    <script> var piqunity = {staticurl: 'static'}; </script>
+    <script src="static/utils.js"></script>
+    <script src="static/j.actions.js"></script>
+    <script src="static/j.baseevents.js"></script>
+    <script src="static/j.carousel.js"></script>
+    <script src="static/j.media.js"></script>
+    <script src="static/j.nav.js"></script>
+    <script src="static/j.navbar.js"></script>
+    <script src="static/j.program.js"></script>
+    <script src="static/j.quiz.js"></script>
+    <script src="static/j.reading.js"></script>
+    <script src="static/j.ref.js"></script>
+    <script src="static/j.scrollspy.js"></script>
+    <script src="static/j.margin.js"></script>
+
+    <script src="static/piqunity.js"></script>
+    <script>$(function() {
+});
+</script>
+
+    
+
+
+</body>
+</html>

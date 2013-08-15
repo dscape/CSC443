@@ -1,0 +1,509 @@
+<!doctype html>
+
+<html>
+<head>
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <link rel='icon' href="static/images/db.png">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap.css">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap-responsive.css">
+    <link rel='stylesheet' href='static/3rdparty/jQuery.jPlayer.2.2.0/skin/blue.monday/jplayer.blue.monday.css'>
+    <link rel='stylesheet' href='static/3rdparty/ligature_symbols/style.css'>
+    <link rel='stylesheet' href='static/3rdparty/prettify/prettify.css'>
+    <link href='static/fonts/PT-serif.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Inconsolata.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Old-Standard-TT.css' rel='stylesheet' type='text/css'>
+
+    <link href='static/piqunity.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-reading.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-lecture.css' rel='stylesheet' type='text/css'>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        messageStyle: 'simple',
+        showMathMenu: false,
+        skipStartupTypeset: false, /* TODO: */
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          skipTags: ["script","noscript","style","textarea"],
+          processEscapes: true
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }},
+        "HTML-CSS": { availableFonts: ["TeX"] }
+      });
+    </script>
+    <script type="text/javascript" src="static/3rdparty/mathjax-2.0/MathJax.js"></script>
+
+    <style>
+    /* default */
+    
+    article > section {
+        margin-left: 100px;
+    }
+
+    
+            .uid_15 td,
+            .uid_15 table { border: none; }
+            .uid_15 td:first-child { width: 30%; }
+            .uid_15 td { border-bottom: thin solid black; }
+        
+    /* desktop */
+    @media (min-width: 1200px) {
+    }
+    /* tablet */
+    @media (min-width: 768px) and (max-width: 1199px) {
+    }
+    /* phone */
+    @media (max-width: 767px) {
+}
+</style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <title>Hash index</title>
+    <link rel='stylesheet' href='style.css'>
+</head>
+
+<body
+    style='padding-top: 40px;' ## for navbar
+    >
+        
+    <div class='navbar-fixed-top navbar piqunity'>
+        <div class='navbar-inner'>
+            <div class='container'>
+                <a class='brand lsf-icon' title='book' 
+                   href='http://dblab.cs.toronto.edu/courses/443/2013' id='home-link'>
+                    Home
+                </a>
+                <ul class='nav' id='main-navbar'>
+                    <li class='dropdown'>
+                        <a href='06.hash-index.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            TOC <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li><a href="06.hash-index.html#" click="scrollto [sysuid=uid_3]">1. Introduction</a><ul></ul><li><a href="06.hash-index.html#" click="scrollto [sysuid=uid_4]">2. Simple disk based hash table</a><ul><li><a href="06.hash-index.html#" click="scrollto [sysuid=uid_8]">2.1. Insertion</a><ul></ul><li><a href="06.hash-index.html#" click="scrollto [sysuid=uid_9]">2.2. Search</a><ul></ul></ul><li><a href="06.hash-index.html#" click="scrollto [sysuid=uid_5]">3. Extensible hash table</a><ul><li><a href="06.hash-index.html#" click="scrollto [sysuid=uid_12]">3.1. Definition of hash tables</a><ul></ul><li><a href="06.hash-index.html#" click="scrollto [sysuid=uid_13]">3.2. Looking up in extended hash table</a><ul></ul><li><a href="06.hash-index.html#" click="scrollto [sysuid=uid_14]">3.3. Resize extensible hash table</a><ul></ul><li><a href="06.hash-index.html#" click="scrollto [sysuid=uid_15]">3.4. Insert into extensible hash table</a><ul></ul></ul>
+                        </ul>
+                    </li>
+
+
+                    <li>
+                        <a id='navbar-scrollspy'></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class='content'>
+        <article sysuid="uid_0" data-meta='{"title": "Hash index", "author": "CSC443 Article"}' class="uid_0"><section class="coverpage"><h1><span></span>Hash index</h1><h2>CSC443 Article</h2><p></p></section>
+
+
+
+<section md="all" sysuid="uid_3" section_number="1."><h1>1. Introduction</h1><div><p>In this article, we continue with the discussion on disk based indexing
+techniques for speeding up record lookup.</p>
+<p>Recall <a href="05.btree-index.html">B+ trees</a> is an adaptation of
+balanced sorted trees to secondary storage devices.  We are going to present
+several disk based adaptions of hash tables, and so that the idea of
+<em>hashing</em> is a powerful tool for highly efficient data lookups on disk.</p></div></section>
+
+<section md="all" sysuid="uid_4" section_number="2."><h1>2. Simple disk based hash table</h1><div><p>The simple disk based hash table is a straight forward adaptation of main
+memory hash table to secondary storage devices.</p>
+<p>Let <mathjax>$K$</mathjax> be the key attributes.  Given a key <mathjax>$k^*$</mathjax>, the hash table can locate
+the <em>page</em> that the page (or pages) that contains the records <mathjax>$r$</mathjax> such that
+<mathjax>$r[K] = k^*$</mathjax>.</p>
+<p>The disk hash table consists of a data file <mathjax>$F$</mathjax>, which may be implemented
+as a heap file.
+We will denote <mathjax>$\mathrm{Pages}(F)$</mathjax> to be the pages of <mathjax>$F$</mathjax>, and
+<mathjax>$\mathrm{addr}(P)$</mathjax> to be the page address of a page <mathjax>$P\in\mathrm{Pages}(F)$</mathjax>.
+It is important that each page <mathjax>$P\in\mathrm{Pages}(F)$</mathjax> can be extended by
+another page via a page pointer <mathjax>$P.\mathtt{next}$</mathjax>.  So, each page can be
+part of a linked list of pages.</p>
+<p>Furthermore, let <mathjax>$\mathcal{K}$</mathjax> be the set containing <em>all</em> possible key
+values.</p>
+<p>A simple hash table on disk is completely characterized by:</p>
+<ul>
+<li>a number <mathjax>$N$</mathjax> of buckets.</li>
+<li>a hash function <mathjax>$h: \mathcal{K} \to N$</mathjax> <br sysuid="uid_6">
+  The hash function maps key values to an integer <mathjax>$0\leq h(k) \lt N$</mathjax>.</li>
+<li>a page locating function 
+  <mathjax>$\mathrm{loc}: N\to\mathrm{addr}(\mathrm{Pages}(F))$</mathjax> <br sysuid="uid_7">
+  The locating function maps an integer <mathjax>$i$</mathjax> to some page address.</li>
+</ul>
+<p>It is understood that both <mathjax>$h$</mathjax> and <mathjax>$\mathrm{loc}$</mathjax> are extremely efficient to
+evaluate.  Many efficient and effective hashing are know:</p>
+<ul>
+<li><a href="http://en.wikipedia.org/wiki/Adler-32">Adler-32</a></li>
+<li><a href="http://en.wikipedia.org/wiki/Rabin%E2%80%93Karp_algorithm">Rabin-Karp</a></li>
+<li><a href="http://en.wikipedia.org/wiki/MD5">MD5</a></li>
+<li><a href="http://en.wikipedia.org/wiki/Secure_Hash_Algorithm">Secure Hash Algorithm (SHA) based hashing</a></li>
+</ul>
+<p>These hashing methods produce very large integers (e.g. 128-bit).  So, we
+would need to modify the range of these hashing methods using integer
+modulo:</p>
+<p><mathjax>$$ h(k) = \mathrm{hashing}(k)\mod N $$</mathjax></p>
+<p>Efficient implementations of <mathjax>$\mathrm{loc}$</mathjax> function can be:</p>
+<ul>
+<li>Let the data file <mathjax>$F$</mathjax> consists of contiguous pages, so we can define:
+  <mathjax>$$\mathrm{loc}(i) = p_0 + i\times B$$</mathjax>
+  where <mathjax>$p_0$</mathjax> is the beginning of the data pages on disk, <mathjax>$B$</mathjax> is the page
+  size.</li>
+<li>If <mathjax>$F$</mathjax> is a heap file, and the pages are not consecutive aligned on disk,
+  we can build a lookup array <mathjax>$A$</mathjax> to store the page pointers.  The array is
+  bounded by <mathjax>$N$</mathjax>.  Because the array only needs to store page pointers, for
+  many applications, it can be cached in main memory.
+  <mathjax>$$\mathrm{loc}(i) = A[i]$$</mathjax></li>
+</ul>
+<p>The motivation of building a hash table on a data file is to speed up record
+lookup by their key.  By the functions <mathjax>$h$</mathjax> and the <mathjax>$loc$</mathjax>, we can very
+quickly locate the <em>right</em> page that contains records with the given key
+value.</p>
+<p>When two records have the same hash value, they will be mapped to the same
+page.  This is called a <em>collision</em>.
+When the number of records in the database become large, the number of
+collisions will increase, and some pages
+<mathjax>$p$</mathjax>, would not be large enough to hold all records with key <mathjax>$k$</mathjax> such that
+<mathjax>$\mathrm{loc}\circ h(k) = p$</mathjax>.</p>
+<p>The solution is to allow overflow pages <mathjax>$p_1, p_2, \dots$</mathjax>, and create a
+linked list: </p>
+<p><mathjax>$$p \to p_1 \to p_2 \to \dots$$</mathjax></p></div><section sysuid="uid_8" section_number="2.1."><h1>2.1. Insertion</h1>
+
+
+        <pre class="dark program prettyprint linenums:1" id="simple-insert" annotated="yes" sysuid="uid_16" data-blocks='{"look": {"start": 13, "end": 18}}'>Key get_key(Record);        /* Get the key of the record */
+long h(Key key);            /* Compute the hash value    */
+PageAddress loc(long hash); /* Locate the page address   */
+
+/**
+ * inserts a record into a disk based `HashTable`
+ */
+void insert(HashTable t, Record record) {
+    Key key = get_key(record);
+    long hash = h(key);
+    PageAddress page_ptr = loc(hash);
+    Page page = Disk::read_page(page_ptr);
+
+    while(page.isFull()) {                  
+        PageAddress page_ptr = page.next;
+        if(page_ptr == null)
+          page_ptr = Disk::allocate_page();
+        page = Disk::read_page(page_ptr);
+    }                                       
+
+    insert_into_page(page, record);
+    Disk::write_page(page_ptr, page);
+}
+</pre>
+        <div color="#555" md="yes" align-middle="#simple-insert .look" sysuid="uid_17" class="margin margin-right"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_17]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div><div><p>Go through the linked list starting with <code>loc(hash)</code> until we
+find a vacancy for the record.</p></div></div></div></div></div>
+    </section><div></div><section sysuid="uid_9" section_number="2.2."><h1>2.2. Search</h1>
+
+        <pre class="dark program prettyprint linenums:1" id="simple-lookup" annotated="yes" sysuid="uid_18" data-blocks='{"loop": {"start": 19, "end": 23}}'>/**
+ * locates all records matching the `key` in the page.  The results are
+ * appended to `results`
+ */
+void Page::find_records_by_key(Key key, vector&lt;Record&gt; *results);
+
+/**
+ * Locates all records in a hash table by key
+ */
+vector&lt;Record&gt; lookup(Hashtable t, Key key) {
+    long hash = h(key);
+    PageAddress page_ptr = loc(hash);
+
+    if(page_ptr == null) {
+        return NOT_FOUND;
+    }
+
+    vector&lt;Record&gt; results;
+
+    while(page_ptr) {                               
+        Page page = Disk::read_page(page_ptr);
+        page.find_records_by_key(key, &amp;results)
+        page_ptr = page.next_page;
+    }                                               
+
+    return results
+}
+</pre>
+        <div color="#555" md="yes" align-middle="#simple-lookup .loop" sysuid="uid_19" class="margin margin-right"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_19]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div><div><ul>
+<li><code>loc(hash)</code> locates the <em>first</em> page that <em>may</em> contain <code>key</code>.</li>
+<li>we have to iterate through all the pages in the linked list and
+  look for records matching the given <code>key</code>.</li>
+</ul></div></div></div></div></div>
+    </section><div></div></section>
+
+<section md="yes" sysuid="uid_5" section_number="3."><h1>3. Extensible hash table</h1><div><p>Simple hash table suffers from a severer drawback: the disk I/O required is
+linear to the average length of the linked lists storing the collisions.
+In order to maintain the <em>constant</em> disk I/O cost that is expected from hash
+tables, one must guarantee a bounded length for the linked list.</p>
+<p>A simple hash table cannot achieve constant record lookup if the number of
+records keeps growing.  The main reasons are:</p>
+<ul>
+<li>a hash table has a fixed <mathjax>$n$</mathjax> number of buckets: <mathjax>$\mathrm{hash}(k)\mod n$</mathjax>.</li>
+<li>if <mathjax>$n$</mathjax> is too small, the linked lists are long, resulting in an increase
+in disk I/O.</li>
+<li>a change in <mathjax>$n$</mathjax> requires one to redistribute <em>all</em> the records in the hash
+table, which is impractical.</li>
+</ul>
+<p>In this section, we introduce a disk based data structure , <a id="extensible" sysuid="uid_10"></a>
+<strong>extensible hash table</strong>, based on hash tables to address the problem.</p></div><div md="yes" align="#extensible" sysuid="uid_11" class="margin margin-right"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_11]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div><div><p>Extensible hash table is also often referred to as <em>extendible hash
+table</em>.</p></div></div></div></div></div><div></div><section md="yes" sysuid="uid_12" section_number="3.1."><h1>3.1. Definition of hash tables</h1><div><p>Extensible hash table extends the simple hash table in two fundamental
+ways:</p>
+<ol>
+<li>a <em>directory</em> mapping bit vectors to pages.  2. a scheme that uses
+variable number of bits of the hash value of a key.</li>
+</ol>
+<p>Let <mathjax>$T$</mathjax> denote an extensible hash table.  A <em>directory</em> of <mathjax>$T$</mathjax> is
+defined as:</p>
+<ul>
+<li>
+<p>an integer counter, <mathjax>$D$</mathjax> , known as the <em>global depth</em> of the
+extensible hash table.  </p>
+</li>
+<li>
+<p>a table that maps bit vectors of length <mathjax>$D$</mathjax> to
+page addresses.  The table has <mathjax>$2^D$</mathjax> entries for bit vectors
+"<mathjax>$00\dots0$</mathjax>" to "<mathjax>$11\dots1$</mathjax>".  We denote the table by the function
+<mathjax>$\mathrm{dir}: 2^D \to \mathrm{addr}(\mathrm{Pages}(F))$</mathjax></p>
+</li>
+</ul>
+<p>Intuitively, given a record <mathjax>$r$</mathjax> with a key <mathjax>$k$</mathjax>, we treat <mathjax>$h(k)$</mathjax> as a bit
+vector (say of length 128 bits).  However, only <mathjax>$D$</mathjax> bits are used to
+determine the bucket page to store <mathjax>$r$</mathjax>.  The page to store <mathjax>$r$</mathjax> is
+located using the directory table of <mathjax>$T$</mathjax>.</p>
+<p><strong>NOTE</strong>: it's possible for two bit vectors to be mapped to the same
+page.</p>
+<p>The following data structure represents an extensible hash table.</p></div><pre class="dark program prettyprint" lineno="" sysuid="uid_20">
+struct Directory { 
+    int global_depth;
+    PageAddress table[]; 
+} 
+</pre><div><p>We can always assert that 
+<code>length(Directory.table) $\leq$ pow(2, Directory.global_depth)</code></p></div><center sysuid="uid_21">
+            <img src="hash-index/01-xhash.png" sysuid="uid_33">
+            <center><div md="yes" sysuid="uid_34" style="max-width: 600px;width: 100%"><div><p>A small extensible hash table with global depth of 2, and 4 pages.</p></div></div></center>
+        </center><div></div></section><div></div><section md="yes" sysuid="uid_13" section_number="3.2."><h1>3.2. Looking up in extended hash table</h1><div><p>Let a key, <mathjax>$k$</mathjax>, and <mathjax>$h$</mathjax> a hash function.  We treat <mathjax>$h(k)$</mathjax> as a bit
+vector (the unsigned binary representation of the integer <mathjax>$h(k)$</mathjax>).
+Let <mathjax>$h(k|L)$</mathjax> denote the bit vector consisting of the <em>first</em> (most
+significant) <mathjax>$L$</mathjax> bits of
+<mathjax>$h(k)$</mathjax>.</p>
+<p>The lookup algorithm for extended hash table is straight forward.  To
+look up record(s) with key value <mathjax>$k$</mathjax>:</p>
+<ul>
+<li>Let <mathjax>$p = \mathrm{dir}(h(k|D))$</mathjax></li>
+<li>Read page <mathjax>$p$</mathjax> from disk, and search through the page for matching
+records.</li>
+</ul></div></section><div></div><section md="yes" sysuid="uid_14" section_number="3.3."><h1>3.3. Resize extensible hash table</h1><div><p>The directory structure allows extensible hash table to resize itself
+with minimal overhead.  Given an extended hash table <mathjax>$T$</mathjax> with a global
+depth <mathjax>$D$</mathjax>. We know that this allows <mathjax>$T$</mathjax> to store at most <mathjax>$2^D$</mathjax> unique
+hash values (of length <mathjax>$D$</mathjax>-bits).  If the number of records are large,
+say <mathjax>$\geq 0.5\cdot 2^D$</mathjax>, the chance of collision becomes significant.</p>
+<p><a name="growing" sysuid="uid_22"></a>
+Extended hash table can <em>grow</em> its capacity by factor of <em>two</em> with
+<em>resizing</em> to avoid collisions.</p></div><div md="yes" align="[name=growing]" icon="info" class="wide margin margin-right" sysuid="uid_23"><div class="margin-anchor"><a href="javascript:void(0)" title="Collision in extended hashing" click="toggle [sysuid=uid_23]"><span class="lsf">info</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title">Collision in extended hashing</h3><div class="popover-content"><div><div><p>Though very rare, it's still possible for collisions to occur in
+extended hashing:</p>
+<ul>
+<li>
+<p>two keys, <mathjax>$k_1$</mathjax> and <mathjax>$k_2$</mathjax>, may have the <em>same</em> hash code. Namely,
+<mathjax>$h(k_1) = h(k_2)$</mathjax>.  Therefore, it's certainly not possible for
+extended hashing to distinguish them.</p>
+</li>
+<li>
+<p>there may be duplicate keys in the data among records.</p>
+</li>
+</ul></div></div></div></div></div><div><p>The resizing is done as follows:</p>
+<ol>
+<li><mathjax>$D_\mathrm{new} = D+1$</mathjax></li>
+<li><mathjax>$\mathrm{dir}_\mathrm{new}(i) = \mathrm{dir}(i \gg 1)$</mathjax>
+   where <mathjax>$i \gg 1$</mathjax> is the bit-shift of <mathjax>$i$</mathjax> by one bit to the right.  In
+   other words, <mathjax>$\mathrm{dir}_\mathrm{new}$</mathjax> uses only <mathjax>$D$</mathjax> bits of <mathjax>$i$</mathjax>.</li>
+</ol>
+<p><strong>Lemma</strong>:</p></div><center><div md="yes" sysuid="uid_24" style="max-width: 600px;width: 100%"><div><ul>
+<li>for <mathjax>$0\leq i \lt 2^D$</mathjax>:
+  <mathjax>$\mathrm{dir}_\mathrm{new}(i) = \mathrm{dir}(i)$</mathjax> </li>
+<li>for <mathjax>$2^D\leq i \lt 2^{D+1}$</mathjax>:
+  <mathjax>$\mathrm{dir}_\mathrm{new}(i) = \mathrm{dir}(i-2^D)$</mathjax> </li>
+</ul></div></div></center><div><p>The first half and second half of <mathjax>$\mathrm{dir}_\mathrm{new}$</mathjax> are copies
+of <mathjax>$\mathrm{dir}$</mathjax>.  This leads too very efficient implementations to
+<code>grow_directory</code>.</p></div><pre annotated="yes" id="resize" class="dark program prettyprint linenums:1" sysuid="uid_25" data-blocks='{"copy": {"start": 4, "end": 7}}'>void grow_directory(Directory *dir) {
+    int D = dir-&gt;global_depth;
+    int new_len = pow(2, D+1);
+    dir-&gt;table = (PageAddress *)realloc(sizeof(PageAddress) * new_len);
+    memcpy(                                          
+        dir-&gt;table+sizeof(PageAddress)*(new_len/2),  // destination (second half)
+        dir-&gt;table,                                  // source (first half)
+        sizeof(PageAddress) * new_len/2)             
+    dir-&gt;global_depth ++;
+}
+</pre><div></div><div color="#555" md="yes" align-middle="#resize .copy" sysuid="uid_26" class="margin margin-right"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_26]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div><div><p>This copies the first half into the second half in the table.
+We illustrated the algorithm using
+<a href="http://www.cplusplus.com/reference/cstring/memcpy/"><code>memcpy</code></a>,
+assuming that the directory is stored in memory.</p></div></div></div></div></div><div><p><strong>Observation</strong></p></div><center><div md="yes" sysuid="uid_27" style="max-width: 600px;width: 100%"><div><ul>
+<li>
+<p>After the resizing, the new extended hash table uses <mathjax>$D+1$</mathjax> bits to
+locate the page.  It's important to note that the duplication of the
+first half of <mathjax>$\mathrm{dir}_\mathrm{new}$</mathjax> in its second half ensures
+that all records that can be located using <mathjax>$D$</mathjax> bits can also be located
+using <mathjax>$D+1$</mathjax> bits from their hash values.</p>
+</li>
+<li>
+<p>Resizing does not need to touch the pages, so it can be very
+efficiently implemented even if the directory is stored on disk.</p>
+</li>
+</ul></div></div></center><div></div></section><div></div><section md="yes" sysuid="uid_15" section_number="3.4." class="uid_15"><h1>3.4. Insert into extensible hash table</h1><div><p>Recall, we indicated that each page must have a counter, the <em>local
+depth</em>, that indicates the number of bits used to hash its records.  The
+local depth was not used for lookup, but it becomes crucial for
+insertion and dynamic hashing.</p>
+<p>Inserting a record into an extensible hash table involves the following
+steps.</p>
+<ol>
+<li>
+<p>Given a record with some key value, <mathjax>$k$</mathjax>, we locate the page that using
+<mathjax>$\mathrm{dir}[h(k|D)]$</mathjax>.  If the page has vacancy, insert the record in
+that page.</p>
+</li>
+<li>
+<p>If the page <mathjax>$p$</mathjax> is full, we need to split the page to two or more pages.
+This is done by distinguishing the records in <mathjax>$p$</mathjax> by more bits than its
+current local depth.  Each pages after the split will have a greater
+local depth, and fewer records hashed to it.  If the new local depth
+exceeds the global depth, we also keep the grow the directory.  Finally,
+the directory table needs to be updated so the split pages are
+references by the correct table entries.</p>
+</li>
+</ol>
+<p>The following algorithm describes these steps in detail.</p></div><pre id="insert" annotated="yes" sysuid="uid_28" data-blocks='{"optimize": {"start": 43}}' class="program prettyprint linenums:1">void insert(Directory &amp;dir, Record r_new) {
+    /**
+     * locate the page that _should_ contain `r_new`
+     */
+    Key key = get_key(r_new)
+    Page p = lookup(dir, key)
+
+    /**
+     * if there is vacancy for one more record, then insert, and
+     * we are done.
+     */
+    if p has vacancy {
+        p.add(r_new);
+    } 
+    /**
+     * page splitting is needed to create vacancy in the 
+     * extended hash table.
+     */
+    else {
+        // gather all the records we need to relocate in `all_records`
+        // gather all their respective keys in `all_keys`
+        vector&lt;Record&gt; all_records = get_records(p) $\cup$ {r_new}
+        vector&lt;BitVector&gt; all_keys = {get_key($x$) : $x\in$ all_records};
+
+        // make sure we choose a local_depth large enough
+        // to distinguish the records.  This ensures that the
+        // split pages will not be full.
+        int d = longest_common_prefix(all_keys) + 1;
+
+        // grow the directory if necessary
+        while(dir-&gt;global_depth &lt; d) {
+            grow_directory(dir);
+        }
+
+        // get the number of distinct hash values of length d-bits.
+        // This is the number of pages we need.
+        vector&lt;BitVector&gt; distinct_hash = {$h$($k$|$d$) : $k\in$ all_keys}
+
+        foreach(BitVector j $\in$ distinct_keys) {
+
+            // create a new page for each d-bit hash value,
+            // and move all the records with such hash value
+            // to this page.
+            Page p_new = allocate_new(); 
+            p_new.local_depth = d;
+            p_new.add({$x\in$ all_keys : h(get_key($x$)|d) == j});
+
+            // update the directory table, so the D-bit hash values
+            // are mapped to the right page address
+            $D$ = dir-&gt;global_depth
+            if($D$ &gt; d)
+                for(BitVector padding=0; padding &lt; pow(2, D-d); padding ++) {
+                    j2 = BitVector::concatenate(j, padding)
+                    dir-&gt;table[j2] = get_address(p_new);
+                }
+            else
+                dir-&gt;table[j] = get_address(p_new);
+        }
+    }
+}
+</pre><div><p><strong>Example</strong></p></div><table record="\|" line=";;" sysuid="uid_30" class="table-bordered table"><tr sysuid="uid_37"><td sysuid="uid_42">Consider an extensible hash table as shown.
+            It's global depth is 1, with two pages and three records.
+            </td><td sysuid="uid_43"> <img src="hash-index/example/ex1.png" id="ex1" sysuid="uid_52"> </td></tr>
+<tr sysuid="uid_38"><td sysuid="uid_44">
+            If we are to grow it once, the global depth will be 2.  While there
+            are still two pages, the new directory can now index up to four
+            pages.
+            </td><td sysuid="uid_45"> <img src="hash-index/example/ex2.png" sysuid="uid_53"></td></tr>
+<tr sysuid="uid_39"><td sysuid="uid_46">
+            Suppose that we are trying to insert a records with $k_3$ such that
+            the hash value is $h(k_3) = 1010$.  We are to first locate the page
+            to insert the record into.
+            </td><td sysuid="uid_47"> <img src="hash-index/example/ex3.png" sysuid="uid_54"></td></tr>
+<tr sysuid="uid_40"><td sysuid="uid_48">
+            <div sysuid="uid_55"><div><p>Since the page is full, we need to split the page.</p>
+<p>The keys of the records are:</p>
+<ul>
+<li><code>1001</code></li>
+<li><code>1010</code></li>
+<li><code>1100</code></li>
+</ul>
+<p>One can observe that the common prefix is 1, so the new local depth
+must be 2.  The records are to be distributed according to the first
+two bits of their hash values: </p>
+<ul>
+<li>page1 = (<code>1001</code>, <code>1010</code>)</li>
+<li>page2 = (<code>1100</code>)</li>
+</ul>
+<p>Finally, we need to update the directory table such that
+<code>10</code> points to page1 and <code>11</code> points to page2.</p></div></div>
+            </td><td sysuid="uid_49"><img src="hash-index/example/ex4.png" sysuid="uid_56"></td></tr>
+<tr sysuid="uid_41"><td sysuid="uid_50">
+            This is the final extended hash table.
+            </td><td sysuid="uid_51"><img src="hash-index/example/ex5.png" sysuid="uid_57"></td></tr>
+</table><div></div></section><div></div></section>
+
+
+</article>
+    </div>
+
+        <script src="static/3rdparty/jquery-1.8.2.min.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/jquery.jplayer.min.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.player.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/popcorn/popcorn.jplayer.js"></script>
+    <script src="static/3rdparty/prettify/prettify.js"></script>    
+    <script src="static/3rdparty/bootstrap-2.2.2/js/bootstrap.js"></script>
+    <script src="static/3rdparty/sprintf-0.7-beta1.js"></script>
+
+    
+    <script> var piqunity = {staticurl: 'static'}; </script>
+    <script src="static/utils.js"></script>
+    <script src="static/j.actions.js"></script>
+    <script src="static/j.baseevents.js"></script>
+    <script src="static/j.carousel.js"></script>
+    <script src="static/j.media.js"></script>
+    <script src="static/j.nav.js"></script>
+    <script src="static/j.navbar.js"></script>
+    <script src="static/j.program.js"></script>
+    <script src="static/j.quiz.js"></script>
+    <script src="static/j.reading.js"></script>
+    <script src="static/j.ref.js"></script>
+    <script src="static/j.scrollspy.js"></script>
+    <script src="static/j.margin.js"></script>
+
+    <script src="static/piqunity.js"></script>
+    <script>$(function() {
+});
+</script>
+
+    
+
+
+</body>
+</html>

@@ -1,0 +1,335 @@
+<!doctype html>
+
+<html>
+<head>
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <link rel='icon' href="static/images/db.png">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap.css">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap-responsive.css">
+    <link rel='stylesheet' href='static/3rdparty/jQuery.jPlayer.2.2.0/skin/blue.monday/jplayer.blue.monday.css'>
+    <link rel='stylesheet' href='static/3rdparty/ligature_symbols/style.css'>
+    <link rel='stylesheet' href='static/3rdparty/prettify/prettify.css'>
+    <link href='static/fonts/PT-serif.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Inconsolata.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Old-Standard-TT.css' rel='stylesheet' type='text/css'>
+
+    <link href='static/piqunity.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-reading.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-lecture.css' rel='stylesheet' type='text/css'>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        messageStyle: 'simple',
+        showMathMenu: false,
+        skipStartupTypeset: false, /* TODO: */
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          skipTags: ["script","noscript","style","textarea"],
+          processEscapes: true
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }},
+        "HTML-CSS": { availableFonts: ["TeX"] }
+      });
+    </script>
+    <script type="text/javascript" src="static/3rdparty/mathjax-2.0/MathJax.js"></script>
+
+    <style>
+    /* default */
+    
+    .explain {
+        font-size: 90%;
+    }
+
+    /* desktop */
+    @media (min-width: 1200px) {
+    }
+    /* tablet */
+    @media (min-width: 768px) and (max-width: 1199px) {
+    }
+    /* phone */
+    @media (max-width: 767px) {
+}
+</style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <title>Memory Hierarchy</title>
+    <link rel='stylesheet' href='style.css'>
+</head>
+
+<body
+    style='padding-top: 40px;' ## for navbar
+    >
+        
+    <div class='navbar-fixed-top navbar piqunity'>
+        <div class='navbar-inner'>
+            <div class='container'>
+                <a class='brand lsf-icon' title='book' 
+                   href='http://dblab.cs.toronto.edu/courses/443/2013' id='home-link'>
+                    Home
+                </a>
+                <ul class='nav' id='main-navbar'>
+                    <li class='dropdown'>
+                        <a href='02.memory-hierarchy.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            TOC <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li><a href="02.memory-hierarchy.html#" click="scrollto [sysuid=uid_3]">1. Memory Hierarchy</a><ul></ul><li><a href="02.memory-hierarchy.html#" click="scrollto [sysuid=uid_4]">2. Data movement</a><ul><li><a href="02.memory-hierarchy.html#" click="scrollto [sysuid=uid_10]">2.1. Move data to and from secondary storage</a><ul></ul><li><a href="02.memory-hierarchy.html#" click="scrollto [sysuid=uid_11]">2.2. Performance characteristics</a><ul></ul><li><a href="02.memory-hierarchy.html#" click="scrollto [sysuid=uid_12]">2.3. Programming exercise</a><ul></ul></ul><li><a href="02.memory-hierarchy.html#" click="scrollto [sysuid=uid_5]">3. Buffer Manager</a><ul></ul>
+                        </ul>
+                    </li>
+
+
+                    <li>
+                        <a id='navbar-scrollspy'></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class='content'>
+        <article sysuid="uid_0" data-meta='{"title": "Memory Hierarchy", "author": "CSC443"}' class="uid_0"><section class="coverpage"><h1><span></span>Memory Hierarchy</h1><h2>CSC443</h2><p></p></section>
+
+
+
+<section markdown="yes" sysuid="uid_3" section_number="1."><h1>1. Memory Hierarchy</h1><div></div><div sysuid="uid_7" class="columns row-fluid">
+        <div span="6" class="span6"><div sysuid="uid_20" class="column"><div><p>Memory is categorized into volatile and nonvolatile memories,
+with the former requiring constant power ON of the system to
+maintain data storage.</p>
+<p>Furthermore, a typical computer system provides a hierarchy of
+different times of memories for data storage.</p></div></div></div>
+        <div span="6" class="span6"><img src="memory-hierarchy/hierarchy.png" sysuid="uid_21" class="column"></div>
+    </div><div></div><hr sysuid="uid_8"><div><h1>Different levels of the memory hierarchy</h1>
+<ol>
+<li>
+<p><em>Cache (MB)</em>: 
+Cache is the fastest accessible memory of a computer system.
+It's access speed is in the order of a few nanoseconds.  It is
+volatile and expensive, so the typical cache size is in the
+order of megabytes.  </p>
+</li>
+<li>
+<p><em>Main memory (GB)</em>:
+Main memory is arguably the most used memory.  When discussing
+computer algorithms such as quick sort, balanced binary sorted
+trees, or fast Fourier transform, one typically assumes that
+the algorithm operates on data stored in the main memory.  The
+main memory is reasonably fast, with access speed around 100
+nanoseconds.  It also offers larger capacity at a lower cost.
+Typical main memory is in the order of 10 GB.  However, the
+main memory is volatile.  </p>
+</li>
+<li>
+<p><em>Secondary storage (TB)</em>:
+Secondary storage refers to nonvolatile data storage units
+that are external to the computer system.  Hard drives and
+solid state drives are examples of secondary storage.  They
+offer very large storage capacity in the order of terabytes at
+very low cost.  Therefore, database servers typically have an
+array of secondary storage devices with data stored
+distributedly and redundantly across these devices.  Despite
+the continuous improvements in access speed of hard drives,
+secondary storage devices are several magnitudes slower than
+main memory.  Modern hard drives have access speed in the
+order of a few milliseconds.</p>
+</li>
+<li>
+<p><em>Tertiary storage (PB)</em>:
+Teriary storage refers storage designed for the purpose
+data backup.  Examples of tertiary storage devices are
+tape drives are robotic driven disk arrays.  They are capable
+of petabyte range storage, but have very slow access speed
+with data access latency in seconds or minutes.</p>
+</li>
+</ol></div><div font="blue 120%" sysuid="uid_9" style="color: blue;font-size: 120%"><div><p>In this course, we are mainly concerned with the main memory and
+the secondary storage of the memory hierarchy.</p></div></div><div></div></section>
+
+<section markdown="yes" sysuid="uid_4" section_number="2."><h1>2. Data movement</h1><div><p>In order to perform computation, data must travel from the
+secondary storage to the CPU.  Due to the vast differences in
+access speed and storage capacity, the operating system performs a
+series of sophisticated steps (both at the levels of hardware and
+the software).</p></div><section markdown="yes" sysuid="uid_10" section_number="2.1."><h1>2.1. Move data to and from secondary storage</h1><div></div><center><div sysuid="uid_22" style="max-width: 600px;width: 100%">
+            <ul class="nav nav-tabs"><li class="active"><a href="02.memory-hierarchy.html#uid_29" data-toggle="tab">Disk cache</a></li></ul><div class="tab-content"><div markdown="yes" justify="yes" sysuid="uid_29" active="yes" class="tab-pane fade in active text-justify" id="uid_29"><div><p>The hard drive has a local data cache.  Because the hard
+drive access speed is so much slower, disk access are
+normally done asynchronously at the hardware level.  The
+hard drive will be instructed to fetch or save data from a
+physical location of a certain size.  The hard drive
+controller will acknowledge the instruction right away,
+and will take sometime to populate the disk cache with the
+requested data block, and then, at a later time, raise an
+interrupt to notify the interested party that the data
+access is complete.  This model of interrupt based data
+transfer is <em>asynchronous</em>.</p></div></div></div>
+        </div></center><div><p>The data transfer speed (from memory to hard drive or vice
+versa) depends on:</p>
+<ol>
+<li>contiguousness of the accessed physical locations on the
+   disk</li>
+<li>the size of the accessed data per request</li>
+</ol></div></section><div></div><section markdown="yes" sysuid="uid_11" section_number="2.2."><h1>2.2. Performance characteristics</h1><div></div><div sysuid="uid_23" class="columns row-fluid">
+            <div span="6" class="span6"><div sysuid="uid_30" class="column"><div><p>The mechanical design of the hard drive naturally leds
+itself to <em>superior</em> sequential access.</p>
+<p>A hard drive consists of an (array of) rotating disk.
+Each disk has a head driven by a mechanical arm which
+performs the bitwise read and write.  If a sequential data
+block is accessed, all bits can be read or written during
+a single rotation.</p>
+<p>However, random access of the hard drive data may require
+multiple rotations for the head to reach all the regions on
+the disk.</p></div></div></div>
+            <div span="6" class="span6"><video width="300px" controls="yes" sysuid="uid_31" class="column" style="width: 300px">
+                <source src="./memory-hierarchy/hard-drive.webm" sysuid="uid_35"></source>
+            </video></div>
+        </div><div></div><hr class="clear" sysuid="uid_24"><div></div><center><div sysuid="uid_25" style="max-width: 600px;width: 100%">
+            <ul class="nav nav-tabs"><li class="active"><a href="02.memory-hierarchy.html#uid_32" data-toggle="tab">Seek time</a></li></ul><div class="tab-content"><div markdown="yes" sysuid="uid_32" active="yes" class="tab-pane fade in active" id="uid_32"><div><p><em>Seek time</em> is measures <em>average</em> time it takes the
+head to travel to the region of interest on disk.
+Typically, the seek time is a few milliseconds.</p></div><table record=";" heading="yes" class="table table-striped table-bordered" sysuid="uid_36"><tr sysuid="uid_38"><th sysuid="uid_43">Roational speed (rpm) </th><th sysuid="uid_44"> Seek time (ms)</th></tr>
+<tr sysuid="uid_39"><td sysuid="uid_45">                15,000                </td><td sysuid="uid_46"> 2</td></tr>
+<tr sysuid="uid_40"><td sysuid="uid_47">                10,000                </td><td sysuid="uid_48"> 3</td></tr>
+<tr sysuid="uid_41"><td sysuid="uid_49">                7,200                 </td><td sysuid="uid_50"> 4.16</td></tr>
+</table><div></div><p sysuid="uid_37">Source: wikipedia <a name="access-time-ref" sysuid="uid_42" class="ref lsf">pin</a></p><div></div></div></div>
+
+            <ul class="nav nav-tabs"><li class="active"><a href="02.memory-hierarchy.html#uid_33" data-toggle="tab">Data transfer rate</a></li></ul><div class="tab-content"><div markdown="yes" sysuid="uid_33" active="yes" class="tab-pane fade in active" id="uid_33"><div><p><em>Data transfer rate</em> is the steady state speed the
+head can read or write data between the disk buffer
+and the disk.  The data tranfer rate can reach 1
+terabites / second.</p></div></div></div>
+        </div></center><div></div></section><div></div><section markdown="yes" sysuid="uid_12" section_number="2.3."><h1>2.3. Programming exercise</h1><div><p>We will experiment with the effects of disk buffer and seek
+time on the efficiency of data transfer from disk to main
+memory.</p>
+<p>We model a program as a sequence of <em>read</em> requests:</p>
+<p><mathjax>$$r_1, r_2, \dots, r_i, ...$$</mathjax></p>
+<p>Each request <mathjax>$r_i$</mathjax> can be characterized by</p>
+<ul>
+<li><mathjax>$L(r_i)$</mathjax>: the start location of the data to be read.</li>
+<li><mathjax>$S(r_i)$</mathjax>: the size of the data to be read.</li>
+<li><mathjax>$t(r_i)$</mathjax>: the duration of <mathjax>$r_i$</mathjax>.</li>
+</ul>
+<p>The overall efficiency is the data transfer rate
+which can be defined as:
+<mathjax>$$ R_j 
+= \frac
+    {\mathrm{total\ data\ transfered}}
+    {\mathrm{total\ time}} 
+= \frac
+    {\sum_{i\leq j} S(r_i)}
+    {\sum_{i\leq j} t(r_i)} $$</mathjax></p>
+<p>We would be interested in the steady state data transfer
+rate: <mathjax>$$R = \lim_{j\to\infty} R_j$$</mathjax></p>
+<p>Let's consider the case that each read request has a constant size:
+<mathjax>$$ \forall i,\ S(r_i) = B $$</mathjax></p>
+<p>It turns out that <mathjax>$R = R(B)$</mathjax>, that is the transfer rate is determined by
+block size of each read request.  A typical relationship between <mathjax>$R$</mathjax> and
+<mathjax>$B$</mathjax> is as follows:</p></div><center sysuid="uid_26">
+            <img src="memory-hierarchy/plot.png" sysuid="uid_34">
+        </center><div></div><hr sysuid="uid_27"><div><p>When data is requested in large enough blocks, we see a drastic improvement in data
+transfer rate.</p></div></section><div></div></section>
+
+<section markdown="yes" sysuid="uid_5" section_number="3."><h1>3. Buffer Manager</h1><div><p><a name="buffermanager" sysuid="uid_13"></a>
+Buffer manager is another technique to further combat disk latency.  Given
+that data should be transferred in blocks, all disk I/O issued by the
+database are done in units of <em>pages</em>.</p>
+<p>A buffer manager allows a section of the main memory, known as the <em>buffer
+pool</em>, to act as a cache in order to reduce the necessary disk I/O activies.</p>
+<p>The buffer pool is partitioned into <em>frames</em>.  Each frame is the size of a
+page.  The buffer manager follows a classical cache manager algorithm to
+perform lazy disk I/O.  Namely, all requests of disk read and write are
+first performs as frame read and write in the buffer pool.  Data is
+transferred between the buffer pool and disk only when a requested page is
+not cached by the buffer pool, or new pages need to be cached but the buffer
+pool is full.</p></div><pre width="60%" id="bufmanager" annotated="yes" sysuid="uid_14" data-blocks='{"a": {"start": 1, "end": 2}, "read": {"start": 4, "end": 12}, "write": {"start": 14, "end": 25}, "evict": {"start": 27, "end": 34}}' class="program prettyprint linenums:1" style="width: 60%">class BufferManager {
+    BufferPool pool = makePool();       
+    DiskManager disk = makeDisk();      
+
+    Page read(Address addr) {           
+        if(pool.contains(addr)) {
+            return pool.get(addr);
+        } else {
+            Page p = disk.get(addr);
+            tryEvictPage();
+            pool.cache(p);
+        }
+    }                                   
+
+    void write(Page p) {                
+        Address addr = p.diskAddress();
+        if(pool.contains(addr)) {
+            Page q = pool.get(addr);
+            q.update(p);
+            q.setDirty();
+        } else {
+            tryEvictPage();
+            pool.cache(p);
+            p.setDirty();
+        }
+    }                                   
+
+    void tryEvictPage() {               
+        if(poll.isFull()) {
+            Page q = poll.getNextEviction();
+            if(q.isDirty())
+                disk.write(q);
+            poll.evict(q);              
+        }
+    }                                   
+}
+</pre><div></div><div md="yes" group="buf" color="#faa" snap="yes" close="yes" align-middle="#bufmanager .a" class="wide margin margin-right closed" sysuid="uid_15"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_15]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div><div><p><code>pool</code> is an object that maintains the frames.  It follows an
+eviction rule to select the next page to be evicted in
+<code>pool.getNextEviction()</code>.</p></div></div></div></div></div><div></div><div md="yes" group="buf" color="#aaf" snap="yes" close="yes" align-middle="#bufmanager .read" class="wide margin margin-right closed" sysuid="uid_16"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_16]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div><div><p><code>read</code> loads a disk page by its address.  If the page address <code>addr</code>
+is already found in the buffer pool, we simply return that.
+Otherwise, we <em>must</em> perform disk read.  After the page is loaded,
+we cache the page.  Eviction may become necessary if the buffer pool
+is full.  When a page is evicted, we must check if it is <em>dirty</em>.  A
+dirty page is if its content has been altered since it's loaded from
+disk.  Dirty pages must be written to disk when evicted.</p></div></div></div></div></div><div></div><div md="yes" group="buf" color="#afa" snap="yes" close="yes" align-middle="#bufmanager .write" class="wide margin margin-right closed" sysuid="uid_17"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_17]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div><div><p><code>write</code> writes a page.  The write request is deferred.  Instead of
+performing a disk write, the buffer manager caches the page (with
+possible eviction).  It is understood that eventually the cached
+page will be expired by the eviction rule.  Since it's a dirty page,
+the eventual eviction will write the page to disk.</p></div></div></div></div></div><div></div><div md="yes" group="buf" color="#aff" snap="yes" close="yes" align-middle="#bufmanager .evict" class="wide margin margin-right closed" sysuid="uid_18"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_18]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div><div><p><code>tryEvictPage</code> removes a page <code>q</code> chosen by an eviction rule
+(<code>getNextEviction</code>) from the pool.  If <code>q</code> is dirty, it needs to be
+written to disk before being evicted.</p></div></div></div></div></div><div></div></section>
+
+<section sysuid="uid_54"></section><section reference="yes"><h1>References</h1><div name="access-time-ref" sysuid="uid_6" class="citation"><span class="index">1</span>
+    <a href="http://en.wikipedia.org/wiki/Hard_drive#Access_time" sysuid="uid_19">
+    Wikipedia article </a>
+</div></section>
+
+</article>
+    </div>
+
+        <script src="static/3rdparty/jquery-1.8.2.min.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/jquery.jplayer.min.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.player.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/popcorn/popcorn.jplayer.js"></script>
+    <script src="static/3rdparty/prettify/prettify.js"></script>    
+    <script src="static/3rdparty/bootstrap-2.2.2/js/bootstrap.js"></script>
+    <script src="static/3rdparty/sprintf-0.7-beta1.js"></script>
+
+    
+    <script> var piqunity = {staticurl: 'static'}; </script>
+    <script src="static/utils.js"></script>
+    <script src="static/j.actions.js"></script>
+    <script src="static/j.baseevents.js"></script>
+    <script src="static/j.carousel.js"></script>
+    <script src="static/j.media.js"></script>
+    <script src="static/j.nav.js"></script>
+    <script src="static/j.navbar.js"></script>
+    <script src="static/j.program.js"></script>
+    <script src="static/j.quiz.js"></script>
+    <script src="static/j.reading.js"></script>
+    <script src="static/j.ref.js"></script>
+    <script src="static/j.scrollspy.js"></script>
+    <script src="static/j.margin.js"></script>
+
+    <script src="static/piqunity.js"></script>
+    <script>$(function() {
+});
+</script>
+
+    
+
+
+</body>
+</html>

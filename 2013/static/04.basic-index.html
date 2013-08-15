@@ -1,0 +1,234 @@
+<!doctype html>
+
+<html>
+<head>
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <link rel='icon' href="static/images/db.png">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap.css">
+    <link rel='stylesheet' href="static/3rdparty/bootstrap-2.2.2/css/bootstrap-responsive.css">
+    <link rel='stylesheet' href='static/3rdparty/jQuery.jPlayer.2.2.0/skin/blue.monday/jplayer.blue.monday.css'>
+    <link rel='stylesheet' href='static/3rdparty/ligature_symbols/style.css'>
+    <link rel='stylesheet' href='static/3rdparty/prettify/prettify.css'>
+    <link href='static/fonts/PT-serif.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Inconsolata.css' rel='stylesheet' type='text/css'>
+    <link href='static/fonts/Old-Standard-TT.css' rel='stylesheet' type='text/css'>
+
+    <link href='static/piqunity.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-reading.css' rel='stylesheet' type='text/css'>
+    <link href='static/piqunity-lecture.css' rel='stylesheet' type='text/css'>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        messageStyle: 'simple',
+        showMathMenu: false,
+        skipStartupTypeset: false, /* TODO: */
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          skipTags: ["script","noscript","style","textarea"],
+          processEscapes: true
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }},
+        "HTML-CSS": { availableFonts: ["TeX"] }
+      });
+    </script>
+    <script type="text/javascript" src="static/3rdparty/mathjax-2.0/MathJax.js"></script>
+
+    <style>
+    /* default */
+    /* desktop */
+    @media (min-width: 1200px) {
+    }
+    /* tablet */
+    @media (min-width: 768px) and (max-width: 1199px) {
+    }
+    /* phone */
+    @media (max-width: 767px) {
+}
+</style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <title>Basic index structures</title>
+    <link rel='stylesheet' href='style.css'>
+</head>
+
+<body
+    style='padding-top: 40px;' ## for navbar
+    >
+        
+    <div class='navbar-fixed-top navbar piqunity'>
+        <div class='navbar-inner'>
+            <div class='container'>
+                <a class='brand lsf-icon' title='book' 
+                   href='http://dblab.cs.toronto.edu/courses/443/2013' id='home-link'>
+                    Home
+                </a>
+                <ul class='nav' id='main-navbar'>
+                    <li class='dropdown'>
+                        <a href='04.basic-index.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            TOC <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li><a href="04.basic-index.html#" click="scrollto [sysuid=uid_2]">1. Motivation for indexing</a><ul></ul><li><a href="04.basic-index.html#" click="scrollto [sysuid=uid_3]">2. Sequential file</a><ul></ul><li><a href="04.basic-index.html#" click="scrollto [sysuid=uid_4]">3. Dense indexes</a><ul></ul><li><a href="04.basic-index.html#" click="scrollto [sysuid=uid_5]">4. Sparse indexes</a><ul></ul><li><a href="04.basic-index.html#" click="scrollto [sysuid=uid_6]">5. Multilevel sparse indexes: tree indexes</a><ul></ul><li><a href="04.basic-index.html#" click="scrollto [sysuid=uid_7]">6. Indexed sequential access method (ISAM)</a><ul><li><a href="04.basic-index.html#" click="scrollto [sysuid=uid_13]">6.1. Limitation of multilevel sparse index</a><ul></ul><li><a href="04.basic-index.html#" click="scrollto [sysuid=uid_14]">6.2. ISAM</a><ul></ul><li><a href="04.basic-index.html#" click="scrollto [sysuid=uid_15]">6.3. Limitation of ISAM</a><ul></ul></ul>
+                        </ul>
+                    </li>
+
+                    <li class='dropdown revision'>
+                        <a href='04.basic-index.html#' data-toggle='dropdown' class='dropdown-toggle'>
+                            Revisions <b class='caret'></b>
+                        </a>
+                        <ul class='dropdown-menu'>
+                            <li> 2012/12/23 Ken Pu, creation </li>
+                        </ul>
+                    </li>
+
+                    <li>
+                        <a id='navbar-scrollspy'></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class='content'>
+        <article sysuid="uid_0" data-meta='{"title": "Basic index structures", "revisions": ["2012/12/23 Ken Pu, creation"], "author": "CSC 443"}'><section class="coverpage"><h1><span></span>Basic index structures</h1><h2>CSC 443</h2><p></p></section>
+
+<section md="yes" sysuid="uid_2" section_number="1."><h1>1. Motivation for indexing</h1><div><p>Heap file supports sequential scan of records.  Theoretically, this is
+sufficient to implement all query operators in SQL.  However, the resulting
+efficiency would be impractically poor.</p>
+<p>In this article, we discuss a number of <em>simple</em> techniques to improve the
+efficiency of record <em>scan</em> and record <em>search</em>. The common theme would be:</p></div><center><div font="italic" sysuid="uid_8" style="max-width: 600px;width: 100%;font-style: italic">
+        Create secondary data storage to minimize disk I/O for record scan and search.
+    </div></center><div></div></section>
+
+<section md="yes" sysuid="uid_3" section_number="2."><h1>2. Sequential file</h1><div><p>A <em>sequential file</em> is a heap file with the properties:</p>
+<ol>
+<li>all records on a page are sorted by some key attributes, <mathjax>$K$</mathjax>.
+<mathjax>$$ \forall P,\ \forall r_i\in P,\ r_i[K]\leq r_{i+1}[K] $$</mathjax></li>
+<li>for all pages <mathjax>$P_i$</mathjax> and <mathjax>$P_{i+1}$</mathjax> in the heap file, we have that all records in <mathjax>$P_i$</mathjax> are less than records in <mathjax>$P_{i+1}$</mathjax> by the key <mathjax>$K$</mathjax>.</li>
+</ol>
+<p><a name="here" sysuid="uid_9"></a></p>
+<p><mathjax>$$ \forall P_i,\ \forall r\in P_i,\ \forall r'\in P_{i+1},\ 
+   r \leq r' $$</mathjax></p>
+<p>Thus, a sequential file is with all the records sorted (by key attributes <mathjax>$K$</mathjax>) over the entire heap file.</p>
+<p>This one to apply binary search when looking up record(s) by their sorted attribute <mathjax>$K$</mathjax>.</p>
+<p>Recall the design of the heap file, to look for a record <mathjax>$r$</mathjax> such that <mathjax>$r[K] = \vec{v}$</mathjax>, we would load page pointers from the heap page directory, and perform binary search by fetching the pages.</p>
+<p>The total number of disk I/O required in the worst case is:</p>
+<p><mathjax>$$ \log_2(N_\mathrm{data\ pages}) + (N_\mathrm{directory\ pages})$$</mathjax></p>
+<p>Sequential file does not address the inefficiency in record scan.</p></div></section>
+
+<section md="yes" sysuid="uid_4" section_number="3."><h1>3. Dense indexes</h1><div><p>Dense indexes are secondary storage which stores redundant data in order to improve the efficiency of query processing.</p>
+<p>Consider the case that a data file <em>already</em> exists.</p>
+<p>Let <mathjax>$K = (k_1, k_2, \dots, k_n)$</mathjax> be a key.  A <em>dense index</em> is a sequential file whose records only contain the values over <mathjax>$K$</mathjax> and a pointer to the address of the data record in the data file:</p>
+<p>For each record <mathjax>$r\in\mathrm{Data\ File}$</mathjax>, we have:
+<mathjax>$$ r_\mathrm{index} = (r[k_1], r[k_2], \dots, r[k_n], \mathrm{address}(r\ \mathrm{in\ Data\ File})) $$</mathjax>
+in the index file.</p></div><center style="border: thin solid red" sysuid="uid_10">
+        <img src="basic-index/dense-index.png" sysuid="uid_16">
+    </center><div><p>The motivation is that there may be a significant reduction in the record size in the index file when compared to the records in the data file.  Thus, each index page contains much more records.  Sequential scan through the index file would refer far less disk I/O since there are fewer pages to be retrieved.</p></div></section>
+
+<section md="yes" sysuid="uid_5" section_number="4."><h1>4. Sparse indexes</h1><div><p>To combine the strengths of sequential files and dense indexes, <em>sparse indexes</em> support binary search for fast record lookup by storing its records sorted by some key <mathjax>$K$</mathjax>, and it further reduces disk I/O required.</p>
+<p>To apply sparse indexes, the data file must be a sequential file, namely data records are sorted by a key <mathjax>$K$</mathjax>.</p>
+<p>The sparse index only stores the key values and address for the <em>first</em> record of each data page in the data file.</p>
+<p>For each data page <mathjax>$P\in\mathrm{Data\ File}$</mathjax>, let <mathjax>$r$</mathjax> be the first record in <mathjax>$P$</mathjax>, we have an index record in the sparse index:
+<mathjax>$$ (r[k_1], r[k_2], \dots, r[k_n], \mathrm{address}(P)) $$</mathjax></p></div><center style="border: thin solid red" sysuid="uid_11">
+        <img src="basic-index/sparse-index.png" sysuid="uid_17">
+    </center><div><p>This reduces the number of index pages in the sparse index.  Searching for records with <mathjax>$r[K]=\vec v$</mathjax> using a sparse index, we need to:</p>
+<ol>
+<li>search in the sparse index for the record <mathjax>$r$</mathjax> such that:
+<mathjax>$$r^* = \mathrm{argmax}_r r[K]\leq \vec{v}$$</mathjax>
+Binary search can be used.</li>
+<li>search in the page pointed by <mathjax>$r^*$</mathjax> for <mathjax>$\{r: r[K] = \vec{v}\}$</mathjax>.</li>
+</ol>
+<p><strong>Assumption</strong>: for simplicity, we assume that we only need to retrieve the first occurance of a record <mathjax>$r$</mathjax> where <mathjax>$r[K] = \vec{v}$</mathjax>.</p></div></section>
+
+<section md="yes" sysuid="uid_6" section_number="5."><h1>5. Multilevel sparse indexes: tree indexes</h1><div><p>Sparse indexes require the data file to be sorted (i.e. a sequential file), and supports record search with:
+<mathjax>$$ \log_2(N_\mathrm{index\ pages}) + 1 $$</mathjax>
+number of disk I/Os.</p>
+<ul>
+<li><mathjax>$\log_2(N_\mathrm{index\ pages})$</mathjax> page reads are needed to locate the index page.</li>
+<li>1 page read to load the data page.</li>
+</ul>
+<p>It turns out that we can improve search even more by making the observation that the sparse index file is a sequential file.  So, itself can be indexes by yet another sparse index.</p></div><center style="border: thin solid red" sysuid="uid_12">
+        <img src="basic-index/multilevel-sparse-index.png" sysuid="uid_18">
+    </center><div><p>Let <mathjax>$D$</mathjax> be the data file, <mathjax>$I1$</mathjax> the first level sparse index, and <mathjax>$I2$</mathjax> the second level sparse index.  Let <mathjax>$N_D$</mathjax>, <mathjax>$N_{I1}$</mathjax>, and <mathjax>$N_{I2}$</mathjax> be the number of pages respectively.</p>
+<p>It is the case that:
+<mathjax>$$N_D &gt; N_{I1} &gt; N_{I2}$$</mathjax></p>
+<p>The number of disk I/Os required for record search is:</p>
+<p><mathjax>$$ \log_2(N_{I2}) + 2 $$</mathjax></p>
+<ul>
+<li><mathjax>$\log_2(N_{I2})$</mathjax> page reads are used to locate index page in <mathjax>$I_2$</mathjax>.</li>
+<li>1 page read to load the index page in <mathjax>$I_1$</mathjax></li>
+<li>1 page read to load the data page.</li>
+</ul></div></section>
+
+<section md="yes" sysuid="uid_7" section_number="6."><h1>6. Indexed sequential access method (ISAM)</h1><div></div><section sysuid="uid_13" section_number="6.1."><h1>6.1. Limitation of multilevel sparse index</h1>
+
+        Multilevel sparse index can be applied successively.  The number of index pages is reduced at each level, until at the top level, there should be only one index page.
+
+        <center style="border: thin solid red" sysuid="uid_19">
+            <img src="basic-index/isam.png" sysuid="uid_22">
+        </center>
+
+        While the multilevel sparse index structure is efficient for record access, unfortunately, it cannot easily support record inserts and updates.
+
+        Recall sparse indexes can only index sorted sequential file. So any record insert and update (on the sorting attributes) must maintain the ordering.  Heap file only supports efficient record appends without any concerns on the ordering of the records.
+    </section><div></div><section md="yes" sysuid="uid_14" section_number="6.2."><h1>6.2. ISAM</h1><div><p><a name="isam" sysuid="uid_20"></a></p>
+<p><em>Indexed Sequential Access Method</em> (ISAM) is an indexing technique based on multilevel sparse index, but it overcomes the limitation of multilevel sparse index, and supports fast record insert and update.</p>
+<p>The modification is that each data page in the data file can have any number of <em>overflow pages</em>.  When inserting a record <mathjax>$r$</mathjax>,</p>
+<ol>
+<li>locate data page <mathjax>$P_i$</mathjax> such that <mathjax>$P_i[0][K]\leq r[K] &lt; P_{i+1}[0][K]$</mathjax>.</li>
+<li>if <mathjax>$P_i$</mathjax> has free space, insert <mathjax>$r$</mathjax> into <mathjax>$P_i$</mathjax>.</li>
+<li>if there is an overflow page, <mathjax>$Q$</mathjax>, of <mathjax>$P_i$</mathjax> that has free space, insert <mathjax>$r$</mathjax> into <mathjax>$Q$</mathjax>.</li>
+<li>if all the overflow pages are also full, create a new overflow page to store <mathjax>$r$</mathjax>.</li>
+</ol></div><center><div sysuid="uid_21" style="max-width: 600px;width: 100%">
+            <img src="basic-index/isam-example.png" sysuid="uid_23">
+            <div sysuid="uid_24"><div><p><strong>Note</strong>: The record (25, ...) is inserted <em>after</em> the index is
+built.  Since there is <em>no</em> space available in the page(s) between
+the key 20 and 30, ISAM must create a new page which is appended
+into the appropriate linked list.  The insertion of (25, ...)
+creates an overflow page.</p></div></div>
+        </div></center><div></div></section><div></div><section md="yes" sysuid="uid_15" section_number="6.3."><h1>6.3. Limitation of ISAM</h1><div><p>ISAM relaxes on the sortedness of records.  Consequently, the worst case performance for record retrieval becomes</p>
+<p><mathjax>$$ \log_2(N_\mathrm{index\ page}) + 
+   \max(N_\mathrm{overflow\ page}) $$</mathjax></p>
+<p>The cause of the limitation of ISAM is that the multilevel sparse indexes are static in the presence of data updates.</p>
+<p>We will discuss the index structure, <em>B+ tree</em>, which addresses the performance degradation of ISAM by means of dynamic tree balancing.</p></div></section><div></div></section>
+</article>
+    </div>
+
+        <script src="static/3rdparty/jquery-1.8.2.min.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/jquery.jplayer.min.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.js"></script>
+    <script src="static/3rdparty/popcorn-1.2/popcorn.player.js"></script>
+    <script src="static/3rdparty/jQuery.jPlayer.2.2.0/popcorn/popcorn.jplayer.js"></script>
+    <script src="static/3rdparty/prettify/prettify.js"></script>    
+    <script src="static/3rdparty/bootstrap-2.2.2/js/bootstrap.js"></script>
+    <script src="static/3rdparty/sprintf-0.7-beta1.js"></script>
+
+    
+    <script> var piqunity = {staticurl: 'static'}; </script>
+    <script src="static/utils.js"></script>
+    <script src="static/j.actions.js"></script>
+    <script src="static/j.baseevents.js"></script>
+    <script src="static/j.carousel.js"></script>
+    <script src="static/j.media.js"></script>
+    <script src="static/j.nav.js"></script>
+    <script src="static/j.navbar.js"></script>
+    <script src="static/j.program.js"></script>
+    <script src="static/j.quiz.js"></script>
+    <script src="static/j.reading.js"></script>
+    <script src="static/j.ref.js"></script>
+    <script src="static/j.scrollspy.js"></script>
+    <script src="static/j.margin.js"></script>
+
+    <script src="static/piqunity.js"></script>
+    <script>$(function() {
+});
+</script>
+
+    
+
+
+</body>
+</html>

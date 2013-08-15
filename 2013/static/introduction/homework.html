@@ -1,0 +1,182 @@
+<!doctype html>
+
+<html>
+<head>
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+        <link rel='icon' href="../static/images/db.png">
+    <link rel='stylesheet' href="../static/3rdparty/bootstrap-2.2.2/css/bootstrap.css">
+    <link rel='stylesheet' href="../static/3rdparty/bootstrap-2.2.2/css/bootstrap-responsive.css">
+    <link rel='stylesheet' href='../static/3rdparty/jQuery.jPlayer.2.2.0/skin/blue.monday/jplayer.blue.monday.css'>
+    <link rel='stylesheet' href='../static/3rdparty/ligature_symbols/style.css'>
+    <link rel='stylesheet' href='../static/3rdparty/prettify/prettify.css'>
+    <link href='../static/fonts/PT-serif.css' rel='stylesheet' type='text/css'>
+    <link href='../static/fonts/Inconsolata.css' rel='stylesheet' type='text/css'>
+    <link href='../static/fonts/Old-Standard-TT.css' rel='stylesheet' type='text/css'>
+
+    <link href='../static/piqunity.css' rel='stylesheet' type='text/css'>
+    <link href='../static/piqunity-reading.css' rel='stylesheet' type='text/css'>
+    <link href='../static/piqunity-lecture.css' rel='stylesheet' type='text/css'>
+
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        messageStyle: 'simple',
+        showMathMenu: false,
+        skipStartupTypeset: false, /* TODO: */
+        extensions: ["tex2jax.js"],
+        jax: ["input/TeX", "output/HTML-CSS"],
+        tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+          displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+          skipTags: ["script","noscript","style","textarea"],
+          processEscapes: true
+        },
+        TeX: { equationNumbers: { autoNumber: "AMS" }},
+        "HTML-CSS": { availableFonts: ["TeX"] }
+      });
+    </script>
+    <script type="text/javascript" src="../static/3rdparty/mathjax-2.0/MathJax.js"></script>
+
+    <style>
+    /* default */
+    /* desktop */
+    @media (min-width: 1200px) {
+    }
+    /* tablet */
+    @media (min-width: 768px) and (max-width: 1199px) {
+    }
+    /* phone */
+    @media (max-width: 767px) {
+}
+</style>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1">
+    <title>Basic setup for the course</title>
+    <link rel='stylesheet' href='../style.css'>
+</head>
+
+<body
+    style='padding-top: 40px;' ## for navbar
+    >
+        
+    <div class='navbar-fixed-top navbar piqunity'>
+        <div class='navbar-inner'>
+            <div class='container'>
+                <a class='brand lsf-icon' title='book' 
+                   href='http://dblab.cs.toronto.edu/courses/443/2013' id='home-link'>
+                    Home
+                </a>
+                <ul class='nav' id='main-navbar'>
+
+
+                    <li>
+                        <a id='navbar-scrollspy'></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class='content'>
+        <article sysuid="uid_0" data-meta='{"title": "Basic setup for the course", "author": "CSC443 Homework"}'><section class="coverpage"><h1><span></span>Basic setup for the course</h1><h2>CSC443 Homework</h2><p></p></section>
+
+<section sysuid="uid_2">
+    <h1 sysuid="uid_5"><span></span>Programming environment</h1>
+
+    <div sysuid="uid_6"><div><ol>
+<li>
+<p>We assume that you work in a Linux working environment.</p>
+</li>
+<li>
+<p>The main programming language for the assignments will be C / C++.  For
+the final project, you are free to use your own language(s) of choice.</p>
+</li>
+<li>
+<p>Marking of your assignments will be automated.  We will rely on <em>Make</em>
+<a name="make" sysuid="uid_9" class="ref lsf">pin</a> to compile your code.  It is important that you are
+familiar with Make.</p>
+</li>
+<li>
+<p>You will be utilizing the leveldb library as a B+ tree implementation.</p>
+<ul>
+<li>
+<p>leveldb<a name="leveldb" sysuid="uid_10" class="ref lsf">pin</a> can be downloaded from:
+  <a href="http://code.google.com/p/leveldb">Google code</a></p>
+</li>
+<li>
+<p>Make sure you can compile the sample codes using 
+<a href="samples/Makefile.html" id="makefile" sysuid="uid_11">this Makefile</a></p>
+<ul>
+<li>Creating and writing to leveldb: <a href="samples/write.cc">write.cc</a></li>
+<li>Opening and reading from leveldb: <a href="samples/read.cc">read.cc</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ol></div><div close="yes" align="#makefile" sysuid="uid_12" class="margin margin-right closed"><div class="margin-anchor"><a href="javascript:void(0)" click="toggle [sysuid=uid_12]"><span class="lsf">comment</span></a></div><div class="margin-content popover right"><div class="arrow"></div><h3 class="popover-title"></h3><div class="popover-content"><div>
+            Examine the Makefile, and see that it requires you to properly
+            define environment variable: <code sysuid="uid_16">$LEVELDB_DIR</code>
+            </div></div></div></div><div><ul>
+<li>
+<p>Compile the binaries using: <code sysuid="uid_13">make all</code></p>
+</li>
+<li>
+<p>Run the tests using: <code sysuid="uid_14"> make test </code></p>
+</li>
+<li>
+<p>Cleanup the build using: <code sysuid="uid_15"> make clean </code></p>
+</li>
+</ul></div></div>
+
+</section>
+
+
+
+<section sysuid="uid_17"></section><section reference="yes"><h1>References</h1><div name="make" sysuid="uid_3" class="citation"><span class="index">1</span>
+    Make: a utility that automatically builds executable programs and
+    libraries.
+    See <a href="http://en.wikipedia.org/wiki/Make_(software)" sysuid="uid_7">Wikipedia</a>.
+</div><div name="leveldb" sysuid="uid_4" class="citation"><span class="index">2</span>
+    LevelDB: a fast key-value storage library written at Google that
+    provides an ordered mapping from string keys to string values.
+    <a href="http://code.google.com/p/leveldb" sysuid="uid_8">Available</a> at Google Code.
+</div></section>
+
+
+</article>
+    </div>
+
+        <script src="../static/3rdparty/jquery-1.8.2.min.js"></script>
+    <script src="../static/3rdparty/jQuery.jPlayer.2.2.0/jquery.jplayer.min.js"></script>
+    <script src="../static/3rdparty/popcorn-1.2/popcorn.js"></script>
+    <script src="../static/3rdparty/popcorn-1.2/popcorn.player.js"></script>
+    <script src="../static/3rdparty/jQuery.jPlayer.2.2.0/popcorn/popcorn.jplayer.js"></script>
+    <script src="../static/3rdparty/prettify/prettify.js"></script>    
+    <script src="../static/3rdparty/bootstrap-2.2.2/js/bootstrap.js"></script>
+    <script src="../static/3rdparty/sprintf-0.7-beta1.js"></script>
+
+    
+    <script> var piqunity = {staticurl: '../static'}; </script>
+    <script src="../static/utils.js"></script>
+    <script src="../static/j.actions.js"></script>
+    <script src="../static/j.baseevents.js"></script>
+    <script src="../static/j.carousel.js"></script>
+    <script src="../static/j.media.js"></script>
+    <script src="../static/j.nav.js"></script>
+    <script src="../static/j.navbar.js"></script>
+    <script src="../static/j.program.js"></script>
+    <script src="../static/j.quiz.js"></script>
+    <script src="../static/j.reading.js"></script>
+    <script src="../static/j.ref.js"></script>
+    <script src="../static/j.scrollspy.js"></script>
+    <script src="../static/j.margin.js"></script>
+
+    <script src="../static/piqunity.js"></script>
+    <script>$(function() {
+});
+</script>
+
+    
+
+
+</body>
+</html>
