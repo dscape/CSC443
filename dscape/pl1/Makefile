@@ -28,3 +28,4 @@ clean:
 	rm bin/get_histogram
 	rm out/*
 	rm -rf node_modules/
+	rm csv/*

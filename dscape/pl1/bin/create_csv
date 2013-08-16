@@ -3,14 +3,16 @@
 var exec = require('child_process').exec;
 var npair = require('n-pair');
 var path = require('path');
+var fs = require('fs');
 
 var first = true;
 var combinations = [];
 
+var www_path = path.join(__dirname, '/../www/create_random_file.html');
+var www_contents = fs.readFileSync(www_path, 'utf-8');
+
 npair([
-  [1024 * 500, // 500kb,
-  1024 * 1024, // 1mb
-  1024 * 1024 * 10, // 10mb
+  [1024 * 1024 * 10, // 10mb
   1024 * 1024 * 50, // 50mb
   1024 * 1024 * 100 // 100mb
   ],
@@ -30,6 +32,14 @@ npair([
   // if we have run all combinations end
   //
   if (combinations.length === 0) {
+    var csvlines = fs.readFileSync(path.join(__dirname, '/../csv/create_random_file.csv'), 'utf-8')
+      .split("\n")
+      .filter(function (line) {
+        return line !== ""
+      });
+    www_contents = www_contents.replace(/#iom[\s\S]+#eom/, '#iom\n  var csv = ' + JSON.stringify(csvlines) + '.join("\\n");\n//#eom');
+    fs.writeFileSync(www_path, www_contents, 'utf-8');
+    console.log('open ' + www_path);
     process.exit(0);
   }
 
@@ -65,3 +75,4 @@ npair([
     next();
   });
 })();
+// lint: 1 error
