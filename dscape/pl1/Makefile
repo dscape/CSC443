@@ -12,16 +12,16 @@ run:
 	get_histogram
 
 create_random_file:
-	./bin/create_csv
+	./bin/create_random_file_csv
 
 get_histogram:
-	./get_histogram foo 1000
-	./get_histogram foo 10000
-	./get_histogram foo 100000
-	./get_histogram foo 1000000
-	./get_histogram foo 10000000
-	./get_histogram foo 100000000
-	./get_histogram foo 1000000000
+	./bin/get_histogram out/foo 10000      | tail -n 1  > csv/get_histogram.csv
+	./bin/get_histogram out/foo 100000     | tail -n 1 >> csv/get_histogram.csv
+	./bin/get_histogram out/foo 1000000    | tail -n 1 >> csv/get_histogram.csv
+	./bin/get_histogram out/foo 1000000    | tail -n 1 >> csv/get_histogram.csv
+	./bin/get_histogram out/foo 10000000   | tail -n 1 >> csv/get_histogram.csv
+	./bin/get_histogram out/foo 100000000  | tail -n 1 >> csv/get_histogram.csv
+	./bin/get_histogram out/foo 1000000000 | tail -n 1 >> csv/get_histogram.csv
 
 clean:
 	rm bin/create_random_file

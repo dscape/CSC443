@@ -28,7 +28,7 @@ int get_popen_data(char *buffer, char *letter) {
   //
   // prepare our command
   //
-  sprintf(command, "fgrep -o %c foo | wc -l | awk '{ print $1 }'", letter[0]); 
+  sprintf(command, "fgrep -o %c out/foo | wc -l | awk '{ print $1 }'", letter[0]); 
 
   //
   // open our pipe
@@ -215,18 +215,23 @@ int main(int argc, char *argv[]) {
   char *stdoutbuffer = calloc(1, DATA_SIZE);
 
   for(i=0; i < 26; i++) {
+    char ch = 'A' + i;
     //
     // 
     //
-    char ch = 'A' + i;
+    /*
+    
+    commented out because it takes FOREVER
+  
     int popenok = get_popen_data(stdoutbuffer, &ch);
 
     if(popenok < 0) {
       printf("Failed to run command\n");
       return popenok;
     }
+    */
 
-    printf("%c  %lu %s", ch, hist[i], stdoutbuffer);
+    printf("%c  %lu %s\n", ch, hist[i], stdoutbuffer);
     bzero(stdoutbuffer, DATA_SIZE);
   }
 
@@ -234,6 +239,8 @@ int main(int argc, char *argv[]) {
   printf("BLOCK SIZE  %lu bytes\n", block_size);  
   printf("TOTAL BYTES  %lu bytes\n", filelen);  
   printf("TIME  %lu milliseconds\n", milliseconds);  
+
+  printf("%lu, %lu, %lu, %f\n", filelen, block_size, milliseconds, (double) filelen/milliseconds * 1000 / 1024);
 
   //
   // close the fd
