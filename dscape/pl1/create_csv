@@ -1,0 +1,58 @@
+#!/usr/bin/env node
+
+var exec = require('child_process').exec;
+var npair = require('n-pair');
+
+var first = true;
+var combinations = [];
+
+npair([
+  [1024 * 500, // 500kb,
+  1024 * 1024, // 1mb
+  1024 * 1024 * 10, // 10mb
+  1024 * 1024 * 50, // 50mb
+  1024 * 1024 * 100 // 100mb
+  ],
+  [Math.pow(10, 1),
+  Math.pow(10, 2),
+  Math.pow(10, 3),
+  Math.pow(10, 4),
+  Math.pow(10, 5),
+  Math.pow(10, 6),
+  Math.pow(10, 7),
+  Math.pow(10, 8)
+  ]], function (x) {
+  combinations.push(x);
+});
+
+(function next() {
+  //
+  // if we have run all combinations end
+  //
+  if (combinations.length === 0) {
+    process.exit(0);
+  }
+
+  //
+  // get the current config
+  //
+  var tuple = combinations.shift();
+  var total_bytes = tuple[0];
+  var block_size = tuple[1];
+
+  //
+  // to have some notion of progress
+  //
+  console.log(['total_bytes:', total_bytes, 'block_size:', block_size, 'remaining:', combinations.length].join(' '));
+
+  var cmd = './create_random_file foo ' + total_bytes + ' ' + block_size + (first ? ' > ' : ' >> ') + 'create_random_file.csv';
+  console.log(cmd);
+
+  //
+  // exec the calculation for block_size and total_bytes
+  //
+  var proc = exec(cmd, function (error, stdout, stderr) {
+    first = false;
+    next();
+  });
+})();

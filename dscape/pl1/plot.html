@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+body { font: 10px sans-serif; }
+.axis path,
+.axis line { fill: none; stroke: #000; shape-rendering: crispEdges; }
+.x.axis path { display: none; }
+.line { fill: none; stroke: steelblue; stroke-width: 1.5px; } 
+</style>
+<body>
+<script src="http://d3js.org/d3.v3.js"></script>
+
+<script>
+var csv = [
+  '1048576,100,32',
+  '1048576,1000,17',
+  '1048576,10000,15',
+  '1048576,100000,14',
+  '1048576,1000000,15',
+  '1048576,10000000,15',
+  '1048576,100000000,14',
+  '10485760,100,306',
+  '10485760,1000,146',
+  '10485760,10000,132',
+  '10485760,100000,132',
+  '10485760,1000000,127',
+  '10485760,10000000,133',
+  '10485760,100000000,131',
+  '52428800,100,2346',
+  '52428800,1000,916',
+  '52428800,10000,726',
+  '52428800,100000,658',
+  '52428800,1000000,731',
+  '52428800,10000000,1028',
+  '52428800,100000000,860',
+  '104857600,100,3379',
+  '104857600,1000,1715',
+  '104857600,10000,1597',
+  '104857600,100000,1565',
+  '104857600,1000000,1679',
+  '104857600,10000000,1695',
+  '104857600,100000000,2346'].join('\n');
+
+var margin = {
+  top: 20,
+  right: 30,
+  bottom: 30,
+  left: 50
+},
+  width = 1000 - margin.left - margin.right,
+  height = 480 - margin.top - margin.bottom;
+
+var x = d3.scale.log().range([0, width]);
+var y = d3.scale.linear().range([height, 0]);
+
+var color = d3.scale.category10();
+
+var xAxis = d3.svg.axis()
+  .scale(x)
+  .orient("bottom");
+
+var yAxis = d3.svg.axis()
+  .scale(y)
+  .orient("left");
+
+var line = d3.svg.line()
+  .interpolate("basis")
+  .x(function (d) {
+    return x(d.block_size);
+  })
+  .y(function (d) {
+    return y(d.ms);
+  });
+
+var svg = d3.select("body").append("svg")
+  .attr("width", width + margin.left + margin.right)
+  .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+csv = d3.csv.parseRows(csv);
+
+var by_block_size = {};
+
+csv.forEach(function (row) {
+  var total_bytes = row[0];
+  var block_size = row[1];
+  var ms = row[2];
+  if (!by_block_size[block_size]) {
+    by_block_size[block_size] = {};
+  }
+  by_block_size[block_size][total_bytes] = ms;
+});
+
+var data = [];
+
+Object.keys(by_block_size)
+  .sort(function (a, b) {
+    a = +a;
+    b = +b;
+    return a - b;
+  }).forEach(function (k) {
+    var contents = by_block_size[k];
+    contents.block_size = k;
+    data.push(contents);
+  });
+
+console.log(data);
+
+color.domain(d3.keys(data[0]).filter(function (key) {
+  return key !== "block_size";
+}));
+
+
+var blocks = color.domain().map(function (name) {
+  return {
+    name: name,
+    values: data.map(function (d) {
+      return {
+        block_size: d.block_size,
+        ms: +d[name]
+      };
+    })
+  };
+});
+
+x.domain(d3.extent(data, function (d) {
+  return d.block_size;
+}));
+
+y.domain([
+    d3.min(blocks, function (c) {
+    return d3.min(c.values, function (v) {
+      return v.ms;
+    });
+  }),
+    d3.max(blocks, function (c) {
+    return d3.max(c.values, function (v) {
+      return v.ms;
+    });
+  })
+  ]);
+
+svg.append("g")
+  .attr("class", "x axis")
+  .attr("transform", "translate(0," + height + ")")
+  .call(xAxis);
+
+svg.append("g")
+  .attr("class", "y axis")
+  .call(yAxis)
+  .append("text")
+  .attr("transform", "rotate(-90)")
+  .attr("y", 6)
+  .attr("dy", ".71em")
+  .style("text-anchor", "end")
+  .text("Duration (ms)");
+
+var block = svg.selectAll(".block")
+  .data(blocks)
+  .enter().append("g")
+  .attr("class", "block");
+
+block.append("path")
+  .attr("class", "line")
+  .attr("d", function (d) {
+    return line(d.values);
+  })
+  .style("stroke", function (d) {
+    return color(d.name);
+  });
+
+block.append("text")
+  .datum(function (d) {
+    return {
+      name: d.name,
+      value: d.values[d.values.length - 1]
+    };
+  })
+  .attr("transform", function (d) {
+    return "translate(" + x(d.value.block_size) + "," + y(d.value.ms) + ")";
+  })
+  .attr("x", 3)
+  .attr("dy", ".35em")
+  .text(function (d) {
+    return d.name;
+  });
+
+</script>
