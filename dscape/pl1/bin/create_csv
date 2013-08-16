@@ -45,7 +45,7 @@ npair([
   //
   console.log(['total_bytes:', total_bytes, 'block_size:', block_size, 'remaining:', combinations.length].join(' '));
 
-  var cmd = './create_random_file foo ' + total_bytes + ' ' + block_size + (first ? ' > ' : ' >> ') + 'create_random_file.csv';
+  var cmd = './create_random_file ../out/foo ' + total_bytes + ' ' + block_size + (first ? ' > ' : ' >> ') + 'create_random_file.csv';
   console.log(cmd);
 
   //

@@ -1,1 +1,4 @@
 node_modules/
+out/
+bin/get_histogram
+bin/create_random_file
