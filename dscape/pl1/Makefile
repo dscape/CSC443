@@ -22,6 +22,7 @@ get_histogram:
 	./bin/get_histogram out/foo 10000000   | tail -n 1 >> csv/get_histogram.csv
 	./bin/get_histogram out/foo 100000000  | tail -n 1 >> csv/get_histogram.csv
 	./bin/get_histogram out/foo 1000000000 | tail -n 1 >> csv/get_histogram.csv
+	./bin/publish_www_get_histogram
 
 clean:
 	rm bin/create_random_file

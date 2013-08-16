@@ -1,0 +1,17 @@
+#!/usr/bin/env node
+
+var path = require('path');
+var fs = require('fs');
+
+var www_path = path.join(__dirname, '/../www/get_histogram.html');
+var www_contents = fs.readFileSync(www_path, 'utf-8');
+
+var csvlines = fs.readFileSync(path.join(__dirname, '/../csv/get_histogram.csv'), 'utf-8')
+  .split("\n")
+  .filter(function (line) {
+    return line !== "";
+  });
+
+www_contents = www_contents.replace(/#iom[\s\S]+#eom/, '#iom\n  var csv = ' + JSON.stringify(csvlines) + '.join("\\n");\n//#eom');
+fs.writeFileSync(www_path, www_contents, 'utf-8');
+console.log('open ' + www_path);

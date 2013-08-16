@@ -35,7 +35,7 @@ npair([
     var csvlines = fs.readFileSync(path.join(__dirname, '/../csv/create_random_file.csv'), 'utf-8')
       .split("\n")
       .filter(function (line) {
-        return line !== ""
+        return line !== "";
       });
     www_contents = www_contents.replace(/#iom[\s\S]+#eom/, '#iom\n  var csv = ' + JSON.stringify(csvlines) + '.join("\\n");\n//#eom');
     fs.writeFileSync(www_path, www_contents, 'utf-8');
@@ -75,4 +75,3 @@ npair([
     next();
   });
 })();
-// lint: 1 error
