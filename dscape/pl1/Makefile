@@ -1,14 +1,18 @@
 C = gcc
 
 all:
-	$(C) -o bin/create_random_file create_random_file.c
-	$(C) -o bin/get_histogram get_histogram.c
+	$(C) -o bin/create_random_file lib/create_random_file.c
+	$(C) -o bin/get_histogram lib/get_histogram.c
 
 config:
 	npm install
 
+run:
+	create_random_file
+	get_histogram
+
 create_random_file:
-	./create_csv
+	./bin/create_csv
 
 get_histogram:
 	./get_histogram foo 1000
@@ -20,5 +24,7 @@ get_histogram:
 	./get_histogram foo 1000000000
 
 clean:
-	rm bin/*
-	rm foo
+	rm bin/create_random_file
+	rm bin/get_histogram
+	rm out/*
+	rm -rf node_modules/
